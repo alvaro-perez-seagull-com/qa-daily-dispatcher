@@ -71,6 +71,23 @@ export const SectionScorecard = {
     const escaped = params.escaped || { s1: 0, s2: 0, s3: 0, s4: 0, s5: 0 };
     const totalEscaped = (escaped.s1 || 0) + (escaped.s2 || 0) + (escaped.s3 || 0) + (escaped.s4 || 0) + (escaped.s5 || 0);
 
+    // Empty state: when no defects exist yet, show clean placeholders matching QA Scorecard default
+    if (totalDefects === 0) {
+      return {
+        score: '—',
+        grade: '—',
+        ringColor: '#185FA5',
+        density: '—',
+        reopen: '—',
+        s1Rate: '—',
+        avgRes: '—',
+        pillars: { s1: 100, s2: 100, s3: 100, s4: 100, s5: 100 },
+        primaryScore: null,
+        sevGroupScore: null,
+        hasData: false
+      };
+    }
+
     // 1. Raw Values
     const rawDensity = totalDefects / sp;
     const rawEscape = (totalDefects + totalEscaped) > 0 ? (totalEscaped / (totalDefects + totalEscaped)) : 0;
@@ -144,134 +161,136 @@ export const SectionScorecard = {
       avgRes: `${rawAvgRes.toFixed(1)}d`,
       pillars,
       primaryScore: Math.round(primaryScore),
-      sevGroupScore: Math.round(sevGroupScore)
+      sevGroupScore: Math.round(sevGroupScore),
+      hasData: true
     };
   },
 
   /**
    * Renders the Quality Scorecard Badge on an offscreen Canvas
-   * matching Christian's UI component (width=506, height=135)
+   * matching Christian Velasco's exact UI component at 2x Retina resolution
+   * (Without S1-S5 pillar bars as requested)
    */
   generateScorecardImage(metrics) {
     const width = 506;
-    const height = 135;
+    const height = 100;
+    const dpr = 2; // 2x supersampling for razor-sharp Retina/High-DPI rendering
     const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
     const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
 
-    // Outer background
+    const hasData = metrics && metrics.hasData !== false && metrics.score !== '—';
+
+    // 1. Outer background (white so corners blend seamlessly in Outlook)
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, width, height);
 
-    // Card background
-    ctx.fillStyle = '#f8f9fa';
-    ctx.strokeStyle = '#e5e7eb';
+    // 2. Card dark background container (matching Christian's UI)
+    ctx.fillStyle = '#18191c';
+    ctx.strokeStyle = '#2d2f36';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.roundRect(8, 8, width - 16, height - 16, 10);
+    ctx.roundRect(6, 6, width - 12, height - 12, 8);
     ctx.fill();
     ctx.stroke();
 
-    // Circular Score Ring
-    const ringCenterX = 68;
-    const ringCenterY = 67;
-    const ringRadius = 40;
+    // 3. Circular Score Ring (Gauge)
+    const ringCenterX = 52;
+    const ringCenterY = 50;
+    const ringRadius = 30;
+
+    // Determine ring accent color (Green for Good/Excellent, matching reference screenshot)
+    let ringColor = '#22c55e'; // Green default for Excellent / Good
+    if (hasData) {
+      const numScore = Number(metrics.score) || 0;
+      if (numScore < 30) ringColor = '#ef4444'; // Red (Poor)
+      else if (numScore < 60) ringColor = '#f59e0b'; // Amber (Moderate)
+      else ringColor = '#22c55e'; // Green (Good & Excellent)
+    } else {
+      ringColor = '#3b82f6'; // Blue accent for empty state
+    }
 
     // Background track
-    ctx.strokeStyle = '#e5e7eb';
-    ctx.lineWidth = 5;
+    ctx.strokeStyle = '#2c2e35';
+    ctx.lineWidth = 4;
     ctx.beginPath();
     ctx.arc(ringCenterX, ringCenterY, ringRadius, 0, 2 * Math.PI);
     ctx.stroke();
 
     // Score progress arc
-    ctx.strokeStyle = metrics.ringColor || '#3B6D11';
-    ctx.lineWidth = 5;
+    ctx.strokeStyle = ringColor;
+    ctx.lineWidth = 4;
     ctx.lineCap = 'round';
     ctx.beginPath();
-    const angle = ((metrics.score || 100) / 100) * 2 * Math.PI;
+    const scoreVal = hasData ? (Number(metrics.score) || 0) : 100;
+    const angle = (Math.max(0, Math.min(100, scoreVal)) / 100) * 2 * Math.PI;
     ctx.arc(ringCenterX, ringCenterY, ringRadius, -0.5 * Math.PI, -0.5 * Math.PI + angle);
     ctx.stroke();
 
-    // Score Number inside ring
-    ctx.fillStyle = '#111827';
-    ctx.font = 'bold 24px Arial, sans-serif';
+    // Center Score & Grade Text
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(String(metrics.score || 100), ringCenterX, ringCenterY - 6);
+    if (!hasData) {
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 20px Arial, sans-serif';
+      ctx.fillText('—', ringCenterX, ringCenterY - 5);
 
-    // Grade Label inside ring
-    ctx.fillStyle = '#6b7280';
-    ctx.font = '10px Arial, sans-serif';
-    ctx.fillText(metrics.grade || 'Excellent', ringCenterX, ringCenterY + 12);
+      ctx.fillStyle = '#8b929e';
+      ctx.font = 'bold 9px Arial, sans-serif';
+      ctx.fillText('—', ringCenterX, ringCenterY + 10);
+    } else {
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 20px Arial, sans-serif';
+      ctx.fillText(String(metrics.score), ringCenterX, ringCenterY - 5);
 
-    // Header title
+      ctx.fillStyle = ringColor;
+      ctx.font = 'bold 9px Arial, sans-serif';
+      ctx.fillText(String(metrics.grade), ringCenterX, ringCenterY + 10);
+    }
+
+    // 4. Header title
     ctx.textAlign = 'left';
     ctx.textBaseline = 'alphabetic';
-    ctx.fillStyle = '#6b7280';
-    ctx.font = 'bold 11px Arial, sans-serif';
-    ctx.fillText('LIVE SCORE PREVIEW', 130, 48);
+    ctx.fillStyle = '#8b929e';
+    ctx.font = 'bold 10.5px Arial, sans-serif';
+    ctx.fillText('LIVE SCORE PREVIEW', 98, 35);
 
-    // Metrics readout line
-    ctx.font = '12px Arial, sans-serif';
-    ctx.fillStyle = '#4b5563';
-    ctx.fillText(`Density: `, 130, 80);
-    ctx.fillStyle = '#111827';
-    ctx.font = 'bold 12px Arial, sans-serif';
-    ctx.fillText(`${metrics.density}/SP`, 180, 80);
+    // 5. Metrics readout: Single clean horizontal line
+    const metricY = 67;
 
-    ctx.font = '12px Arial, sans-serif';
-    ctx.fillStyle = '#4b5563';
-    ctx.fillText(`Reopen: `, 250, 80);
-    ctx.fillStyle = '#111827';
-    ctx.font = 'bold 12px Arial, sans-serif';
-    ctx.fillText(`${metrics.reopen}%`, 302, 80);
+    // Density
+    ctx.font = '11.5px Arial, sans-serif';
+    ctx.fillStyle = '#8b929e';
+    ctx.fillText('Density: ', 98, metricY);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 11.5px Arial, sans-serif';
+    ctx.fillText(hasData ? `${metrics.density}/SP` : '—', 146, metricY);
 
-    ctx.font = '12px Arial, sans-serif';
-    ctx.fillStyle = '#4b5563';
-    ctx.fillText(`S1 rate: `, 360, 80);
-    ctx.fillStyle = '#111827';
-    ctx.font = 'bold 12px Arial, sans-serif';
-    ctx.fillText(`${metrics.s1Rate}%`, 408, 80);
+    // Reopen
+    ctx.font = '11.5px Arial, sans-serif';
+    ctx.fillStyle = '#8b929e';
+    ctx.fillText('Reopen: ', 202, metricY);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 11.5px Arial, sans-serif';
+    ctx.fillText(hasData ? `${metrics.reopen}%` : '—', 248, metricY);
 
-    ctx.font = '12px Arial, sans-serif';
-    ctx.fillStyle = '#4b5563';
-    ctx.fillText(`Avg res: `, 130, 105);
-    ctx.fillStyle = '#111827';
-    ctx.font = 'bold 12px Arial, sans-serif';
-    ctx.fillText(`${metrics.avgRes}`, 180, 105);
+    // S1 rate
+    ctx.font = '11.5px Arial, sans-serif';
+    ctx.fillStyle = '#8b929e';
+    ctx.fillText('S1 rate: ', 294, metricY);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 11.5px Arial, sans-serif';
+    ctx.fillText(hasData ? `${metrics.s1Rate}%` : '—', 338, metricY);
 
-    // Draw 5 Severity Mini-Pillars (Top Right)
-    const pillars = metrics.pillars || { s1: 100, s2: 100, s3: 100, s4: 100, s5: 100 };
-    const barBaseX = 405;
-    const barBaseY = 100;
-    const barMaxH = 26;
-    const barW = 8;
-    const barGap = 8;
-
-    ['s1', 's2', 's3', 's4', 's5'].forEach((k, i) => {
-      const bx = barBaseX + (i * (barW + barGap));
-      const pVal = pillars[k] !== undefined ? pillars[k] : 100;
-      const bH = Math.max(2, (pVal / 100) * barMaxH);
-      const by = barBaseY - bH;
-
-      // Color based on pillar score
-      ctx.fillStyle = pVal >= 90 ? '#3B6D11' : (pVal >= 60 ? '#185FA5' : (pVal >= 30 ? '#b45309' : '#A32D2D'));
-      ctx.beginPath();
-      ctx.roundRect(bx, by, barW, bH, 2);
-      ctx.fill();
-
-      // Score above bar
-      ctx.font = 'bold 8px Arial, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(String(pVal), bx + (barW / 2), by - 3);
-
-      // Label below bar (S1..S5)
-      ctx.fillStyle = '#6b7280';
-      ctx.font = '8px Arial, sans-serif';
-      ctx.fillText(`S${i + 1}`, bx + (barW / 2), barBaseY + 11);
-    });
+    // Avg res
+    ctx.font = '11.5px Arial, sans-serif';
+    ctx.fillStyle = '#8b929e';
+    ctx.fillText('Avg res: ', 386, metricY);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 11.5px Arial, sans-serif';
+    ctx.fillText(hasData ? `${metrics.avgRes}` : '—', 432, metricY);
 
     return canvas.toDataURL('image/png');
   },
@@ -283,9 +302,7 @@ export const SectionScorecard = {
     return `
 <h2 class=MsoHeading2 style='mso-style-name:"Heading 2";mso-outline-level:2;margin-top:12.0pt;margin-right:0in;margin-bottom:6.0pt;margin-left:0in;page-break-after:avoid;font-size:15.0pt;font-family:"Segoe UI",Arial,sans-serif;color:#0F4761;font-weight:bold'><span class=Heading2Char style='mso-style-name:"Heading 2 Char";font-size:15.0pt;font-family:"Segoe UI",Arial,sans-serif;color:#0F4761;font-weight:bold;mso-fareast-font-family:"Times New Roman"'>Quality Scorecard<o:p></o:p></span></h2>
 <p class=MsoNormal><o:p>&nbsp;</o:p></p>
-<p class=MsoNormal><img width=506 height=135 src="${scorecardBase64}" style='height:1.406in;width:5.27in'></p>
-<p class=MsoNormal><o:p>&nbsp;</o:p></p>
-<p class=MsoNormal><o:p>&nbsp;</o:p></p>
+<p class=MsoNormal><img width=506 height=100 src="${scorecardBase64}" style='height:1.042in;width:5.27in'></p>
 <p class=MsoNormal><o:p>&nbsp;</o:p></p>
 `;
   }

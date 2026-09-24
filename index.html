@@ -203,6 +203,9 @@
             <button type="button" class="btn btn-secondary" onclick="openJiraPasteModal()" title="Import/paste rows copied from Jira">
               <span>📋 Paste from Jira</span>
             </button>
+            <button type="button" class="btn btn-secondary" onclick="refreshScorecardLive()" title="Recalculate quality scorecard live from active defect data">
+              <span>🔄 Refresh Scorecard</span>
+            </button>
             <button type="button" class="btn btn-secondary" onclick="addBugRow()">+ Add Bug</button>
           </div>
         </div>
@@ -399,6 +402,6 @@
   <div id="toast" class="toast"></div>
 
   <!-- ES Module Application Entrypoint -->
-  <script type="module" src="js/app.js?v=18"></script>
+  <script type="module" src="js/app.js?v=20"></script>
 </body>
 </html>

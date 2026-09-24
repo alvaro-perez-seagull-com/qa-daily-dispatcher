@@ -1,12 +1,12 @@
-import { SectionIntro } from './section-intro.js?v=18';
-import { SectionSummary } from './section-summary.js?v=18';
-import { SectionScorecard } from './section-scorecard.js?v=18';
-import { SectionBugsChart } from './section-bugs-chart.js?v=18';
-import { SectionBugsList } from './section-bugs-list.js?v=18';
-import { SectionLinks } from './section-links.js?v=18';
-import { TemplateMso } from './template-mso.js?v=18';
-import { ClipboardHelper } from './clipboard.js?v=18';
-import { JiraImporter } from './jira-importer.js?v=18';
+import { SectionIntro } from './section-intro.js?v=20';
+import { SectionSummary } from './section-summary.js?v=20';
+import { SectionScorecard } from './section-scorecard.js?v=20';
+import { SectionBugsChart } from './section-bugs-chart.js?v=20';
+import { SectionBugsList } from './section-bugs-list.js?v=20';
+import { SectionLinks } from './section-links.js?v=20';
+import { TemplateMso } from './template-mso.js?v=20';
+import { ClipboardHelper } from './clipboard.js?v=20';
+import { JiraImporter } from './jira-importer.js?v=20';
 
 const STORAGE_KEY = 'seagull_dispatcher_v1';
 
@@ -494,7 +494,13 @@ function syncInputsToState() {
   state.links.epicUrl = epicKey ? `https://mojixinc.atlassian.net/browse/${epicKey}` : '';
   state.links.filterUrl = document.getElementById('input-filter-url')?.value || '';
 
-  state.scorecardParams.storyPoints = Number(document.getElementById('input-sp')?.value) || state.scorecardParams.storyPoints;
+  const spInput = document.getElementById('input-sp');
+  if (spInput && spInput.value.trim() !== '') {
+    const spVal = parseFloat(spInput.value);
+    if (!isNaN(spVal) && spVal > 0) {
+      state.scorecardParams.storyPoints = spVal;
+    }
+  }
 
   saveState();
 }
@@ -795,8 +801,8 @@ function renderBugsTable() {
             <option value="Closed" ${b.status === 'Closed' ? 'selected' : ''}>Closed</option>
           </select>
         </td>
-        <td><input type="number" class="form-control" style="text-align:right" value="${b.reopened || 0}" onchange="updateBug(${idx}, 'reopened', this.value, this)"></td>
-        <td class="age-cell" style="text-align:right"><input type="text" inputmode="decimal" class="form-control" style="text-align:right" value="${age}" onchange="updateBug(${idx}, 'age', this.value, this)" title="Age in days (e.g. 0.8 or 14)"></td>
+        <td><input type="number" class="form-control" style="text-align:right" value="${b.reopened || 0}" oninput="updateBug(${idx}, 'reopened', this.value, this, true)" onchange="updateBug(${idx}, 'reopened', this.value, this, false)"></td>
+        <td class="age-cell" style="text-align:right"><input type="text" inputmode="decimal" class="form-control" style="text-align:right" value="${age}" oninput="updateBug(${idx}, 'age', this.value, this, true)" onchange="updateBug(${idx}, 'age', this.value, this, false)" title="Age in days (e.g. 0.8 or 14)"></td>
         <td style="text-align:center"><button class="btn-icon danger" tabindex="-1" title="Delete Bug" onclick="removeBugRow(${idx})">&times;</button></td>
       `;
       tbody.appendChild(tr);
@@ -806,12 +812,17 @@ function renderBugsTable() {
   renderLiveStats();
 }
 
-window.updateBug = function(index, field, value, el) {
+window.updateBug = function(index, field, value, el, isInputEvent = false) {
   if (field === 'age') {
     const cleanStr = String(value).trim().replace(/[^0-9.]/g, '');
     const parsed = parseFloat(cleanStr);
     state.bugs[index].age = !isNaN(parsed) ? parsed : 0;
-    if (el) el.value = state.bugs[index].age;
+    if (el && !isInputEvent) el.value = state.bugs[index].age;
+  } else if (field === 'reopened') {
+    const cleanStr = String(value).trim().replace(/[^0-9]/g, '');
+    const parsed = parseInt(cleanStr, 10);
+    state.bugs[index].reopened = !isNaN(parsed) ? parsed : 0;
+    if (el && !isInputEvent) el.value = state.bugs[index].reopened;
   } else {
     state.bugs[index][field] = value;
   }
@@ -828,6 +839,12 @@ window.updateBug = function(index, field, value, el) {
 
   renderLiveStats();
   saveState();
+};
+
+window.refreshScorecardLive = function() {
+  syncInputsToState();
+  renderLiveStats();
+  showToast('Quality Scorecard recalculated from active defect data!');
 };
 
 window.updateBugKey = function(index, value) {
@@ -993,6 +1010,7 @@ function renderLiveStats() {
 
   const badgeEl = document.getElementById('live-scorecard-badge');
   if (badgeEl) {
+    const isZero = counts.total === 0;
     badgeEl.innerHTML = `
       <div class="score-circle" style="border-color:${scoreMetrics.ringColor}">
         <div class="score-val">${scoreMetrics.score}</div>
@@ -1001,9 +1019,9 @@ function renderLiveStats() {
       <div>
         <div style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase">Live Score Preview</div>
         <div style="font-size:12px;color:#374151;margin-top:2px">
-          Density: <strong>${scoreMetrics.density}/SP</strong> &bull; 
-          Reopen: <strong>${scoreMetrics.reopen}%</strong> &bull; 
-          S1 rate: <strong>${scoreMetrics.s1Rate}%</strong> &bull; 
+          Density: <strong>${scoreMetrics.density}${isZero ? '' : '/SP'}</strong> &bull; 
+          Reopen: <strong>${scoreMetrics.reopen}${isZero ? '' : '%'}</strong> &bull; 
+          S1 rate: <strong>${scoreMetrics.s1Rate}${isZero ? '' : '%'}</strong> &bull; 
           Avg res: <strong>${scoreMetrics.avgRes}</strong> &bull;
           Bugs: <strong>${counts.total}</strong>
         </div>
