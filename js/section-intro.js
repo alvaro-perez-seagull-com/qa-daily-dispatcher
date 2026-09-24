@@ -32,36 +32,60 @@ export const SectionIntro = {
     // General version pattern strip (e.g. "BTC v12.6", "BTOP v12.1.1")
     name = name.replace(/^(BTC|BTOP|BTO)\s*v?\d+(\.\d+)*[:\s-]*/i, '');
 
-    // Strip bracketed or raw keys matching idea or epic
-    if (ideaKey) {
-      const escIdea = ideaKey.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      name = name.replace(new RegExp(`^\\[?\\s*${escIdea}\\s*\\]?[:\\s-]*`, 'i'), '');
-    }
-    if (epicKey) {
-      const escEpic = epicKey.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      name = name.replace(new RegExp(`^\\[?\\s*${escEpic}\\s*\\]?[:\\s-]*`, 'i'), '');
-    }
-    // Strip any remaining leading bracketed key (e.g. "[IDEA-3110" or "[BPLAT-20767]")
-    name = name.replace(/^\[?[A-Z]{2,10}-\d+\]?[:\s-]*/i, '');
+    // Strip bracketed or raw keys (loop to catch both IDEA and EPIC if both are present in title)
+    for (let i = 0; i < 3; i++) {
+      let changed = false;
+      if (ideaKey) {
+        const escIdea = ideaKey.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const before = name;
+        name = name.replace(new RegExp(`^\\[?\\s*${escIdea}\\s*\\]?[:\\s-]*`, 'i'), '');
+        if (name !== before) changed = true;
+      }
+      if (epicKey) {
+        const escEpic = epicKey.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const before = name;
+        name = name.replace(new RegExp(`^\\[?\\s*${escEpic}\\s*\\]?[:\\s-]*`, 'i'), '');
+        if (name !== before) changed = true;
+      }
+      // Strip any remaining leading bracketed key (e.g. "[IDEA-3110" or "[BPLAT-20767]")
+      const beforeKey = name;
+      name = name.replace(/^\[?[A-Z]{2,10}-\d+\]?[:\s-]*/i, '');
+      if (name !== beforeKey) changed = true;
 
-    // Clean up any remaining leading separators
-    name = name.replace(/^[:\s-]+/, '').trim();
+      // Clean up any remaining leading separators
+      name = name.replace(/^[:\s-]+/, '').trim();
+      if (!changed) break;
+    }
+
     return name;
   },
 
   /**
-   * Generates the subject line
-   * e.g.: BTC v12.6: [IDEA-3110] Intelligent Forms: Refreshable Print Preview - Daily Status - 2026-09-24
+   * Generates the subject line matching Seagull QA rules:
+   * 1. Both IDEA and EPIC: Product vX.Y: [IDEA-NNN] - EPIC# - Feature Name - Daily Status - YYYY-MM-DD
+   * 2. IDEA only:          Product vX.Y: [IDEA-NNN] Feature Name - Daily Status - YYYY-MM-DD
+   * 3. EPIC only:          Product vX.Y: EPIC# - Feature Name - Daily Status - YYYY-MM-DD
    */
   generateSubject(data) {
     const today = new Date().toISOString().split('T')[0];
-    const keys = [data.ideaKey, data.epicKey].filter(k => k && k.trim()).join(' / ');
-    const prefix = keys ? `[${keys}] ` : '';
-    const cleanName = this.cleanFeatureName(data.featureName, data.productVersion, data.ideaKey, data.epicKey);
+    const idea = (data.ideaKey || '').trim();
+    const epic = (data.epicKey || '').trim();
+
+    const cleanName = this.cleanFeatureName(data.featureName, data.productVersion, idea, epic);
     const finalFeature = cleanName || data.featureName || 'Test Feature';
     const ver = (data.productVersion || '').trim();
     const verPrefix = ver ? `${ver}: ` : '';
-    return `${verPrefix}${prefix}${finalFeature} - Daily Status - ${today}`;
+
+    let keySegment = '';
+    if (idea && epic) {
+      keySegment = `[${idea}] - ${epic} - `;
+    } else if (idea) {
+      keySegment = `[${idea}] `;
+    } else if (epic) {
+      keySegment = `${epic} - `;
+    }
+
+    return `${verPrefix}${keySegment}${finalFeature} - Daily Status - ${today}`;
   },
 
   /**
@@ -113,6 +137,7 @@ ${ccStr ? `<p class=MsoNormal style='margin-left:120.0pt;text-indent:-120.0pt;ta
 ${headerBlock}
 
 <p class=MsoNormal style='font-family:"Aptos",sans-serif;font-size:12.0pt;'>Team,</p>
+<p class=MsoNormal style='font-family:"Aptos",sans-serif;font-size:12.0pt;'><o:p>&nbsp;</o:p></p>
 <p class=MsoNormal style='margin-bottom:12.0pt;font-family:"Aptos",sans-serif;font-size:12.0pt;'>&lt;your message here!&gt;</p>
 `;
   }

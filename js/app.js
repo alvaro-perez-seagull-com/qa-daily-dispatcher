@@ -1,12 +1,12 @@
-import { SectionIntro } from './section-intro.js?v=20';
-import { SectionSummary } from './section-summary.js?v=20';
-import { SectionScorecard } from './section-scorecard.js?v=20';
-import { SectionBugsChart } from './section-bugs-chart.js?v=20';
-import { SectionBugsList } from './section-bugs-list.js?v=20';
-import { SectionLinks } from './section-links.js?v=20';
-import { TemplateMso } from './template-mso.js?v=20';
-import { ClipboardHelper } from './clipboard.js?v=20';
-import { JiraImporter } from './jira-importer.js?v=20';
+import { SectionIntro } from './section-intro.js?v=21';
+import { SectionSummary } from './section-summary.js?v=21';
+import { SectionScorecard } from './section-scorecard.js?v=21';
+import { SectionBugsChart } from './section-bugs-chart.js?v=21';
+import { SectionBugsList } from './section-bugs-list.js?v=21';
+import { SectionLinks } from './section-links.js?v=21';
+import { TemplateMso } from './template-mso.js?v=21';
+import { ClipboardHelper } from './clipboard.js?v=21';
+import { JiraImporter } from './jira-importer.js?v=21';
 
 const STORAGE_KEY = 'seagull_dispatcher_v1';
 
@@ -273,8 +273,8 @@ function updateFilterUrl() {
   const epic = (epicInput ? epicInput.value : (state.introData.epicKey || '')).trim();
   const version = (document.getElementById('input-product-version')?.value || state.introData.productVersion || 'BTC v12.6').trim();
 
-  // Priority: IDEA JIRA Key > EPIC JIRA Key
-  const activeKey = idea || epic;
+  // Priority: EPIC JIRA Key > IDEA JIRA Key (Epics scope defects to the specific sprint/release)
+  const activeKey = epic || idea;
   const generatedUrl = activeKey ? SectionLinks.generateFilterUrl(activeKey, version) : '';
 
   state.links.filterUrl = generatedUrl;
@@ -458,6 +458,18 @@ window.addBugRow = function() {
   });
   renderBugsTable();
   saveState();
+
+  const newIdx = state.bugs.length - 1;
+  const tbody = document.getElementById('bugs-tbody');
+  if (tbody && tbody.rows[newIdx]) {
+    const keyInput = tbody.rows[newIdx].querySelector('td:nth-child(2) input');
+    if (keyInput) {
+      setTimeout(() => {
+        keyInput.focus();
+        keyInput.select();
+      }, 50);
+    }
+  }
 };
 
 window.removeBugRow = function(index) {

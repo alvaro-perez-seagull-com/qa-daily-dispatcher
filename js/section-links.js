@@ -7,7 +7,7 @@ export const SectionLinks = {
   defaultLinks: {
     ideaKey: "IDEA-3110",
     epicKey: "BPLAT-20767",
-    filterUrl: "https://mojixinc.atlassian.net/issues?filter=26711&jql=type%20IN%20(Improvement%2C%20Bug)%20and%20Project%20%3D%20%22Bartender%20Platform%22%20and%20labels%20IN%20(IDEA-3110)%20and%20status%20!%3D%20Invalid%20AND%20affectedVersion%20%3D%20%22BTC%20v12.6%22%0AORDER%20BY%20%22cf%5B10700%5D%22%20ASC%2C%20fixVersion%20DESC%2C%20created%20ASC"
+    filterUrl: "https://mojixinc.atlassian.net/issues?filter=26711&jql=type%20IN%20(Improvement%2C%20Bug)%20and%20Project%20%3D%20%22Bartender%20Platform%22%20and%20labels%20IN%20(BPLAT-20767)%20and%20status%20!%3D%20Invalid%20AND%20affectedVersion%20%3D%20%22BTC%20v12.6%22%0AORDER%20BY%20%22cf%5B10700%5D%22%20ASC%2C%20fixVersion%20DESC%2C%20created%20ASC"
   },
 
   /**
@@ -21,7 +21,7 @@ export const SectionLinks = {
 
   /**
    * Generates the Jira bug filter search URL based on key and product version.
-   * Priority: IDEA key > Epic key
+   * Priority: Epic key > IDEA key
    */
   generateFilterUrl(key, productVersion = 'BTC v12.6') {
     if (!key || !key.trim()) return '';

@@ -189,7 +189,7 @@ export const SectionSummary = {
 
     const rowsHtml = cycles.map((c, idx) => `
  <tr style='mso-yfti-irow:${idx + 1};height:25.5pt'>
-  <td width=159 valign=top style='width:119.0pt;border:solid black 1.0pt;padding:0in 5.4pt 0in 5.4pt;height:25.5pt'>
+  <td width=336 valign=top style='width:251.5pt;border:solid black 1.0pt;padding:0in 5.4pt 0in 5.4pt;height:25.5pt'>
    <p class=MsoNormal>${this.renderAreaCell(c)}<o:p></o:p></p>
   </td>
   <td width=115 valign=top style='width:86.0pt;border:solid black 1.0pt;border-left:none;padding:0in 5.4pt 0in 5.4pt;height:25.5pt'>
@@ -222,10 +222,10 @@ export const SectionSummary = {
 <h2 class=MsoHeading2 style='mso-style-name:"Heading 2";mso-outline-level:2;margin-top:12.0pt;margin-right:0in;margin-bottom:6.0pt;margin-left:0in;page-break-after:avoid;font-size:15.0pt;font-family:"Segoe UI",Arial,sans-serif;color:#0F4761;font-weight:bold'><span class=Heading2Char style='mso-style-name:"Heading 2 Char";font-size:15.0pt;font-family:"Segoe UI",Arial,sans-serif;color:#0F4761;font-weight:bold;mso-fareast-font-family:"Times New Roman"'>Summary<o:p></o:p></span></h2>
 <p class=MsoNormal><o:p>&nbsp;</o:p></p>
 
-<table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width=933
- style='width:700.0pt;border-collapse:collapse;mso-yfti-tbllook:1184;mso-padding-alt:0in 0in 0in 0in'>
+<table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width=1110
+ style='width:832.5pt;border-collapse:collapse;mso-yfti-tbllook:1184;mso-padding-alt:0in 0in 0in 0in'>
  <tr style='mso-yfti-irow:0;mso-yfti-firstrow:yes;height:12.75pt'>
-  <td width=159 nowrap valign=top style='width:119.0pt;background:#B3CEFB;padding:0in 5.4pt 0in 5.4pt;height:12.75pt'>
+  <td width=336 nowrap valign=top style='width:251.5pt;background:#B3CEFB;padding:0in 5.4pt 0in 5.4pt;height:12.75pt'>
   <p class=MsoNormal align=center style='text-align:center'><b><span style='font-size:8.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>Area</span></b><o:p></o:p></p>
   </td>
   <td width=115 nowrap valign=top style='width:86.0pt;background:#B3CEFB;padding:0in 5.4pt 0in 5.4pt;height:12.75pt'>

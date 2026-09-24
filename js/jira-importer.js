@@ -365,38 +365,46 @@ export const JiraImporter = {
       age: -1
     };
 
+    let matchedHeaderCount = 0;
+
     headers.forEach((h, idx) => {
-      const clean = (h || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+      const raw = String(h || '').trim();
+      // Headers are concise column titles (< 40 chars), never long bug summaries
+      if (raw.length === 0 || raw.length > 40) return;
+
+      const clean = raw.toLowerCase().replace(/[^a-z0-9]/g, '');
 
       if (clean === 'type' || clean === 'issuetype' || clean === 't') {
         mapping.type = idx;
-        mapping.hasHeader = true;
+        matchedHeaderCount++;
       } else if (clean === 'key' || clean === 'issuekey' || clean === 'id' || clean === 'issueid') {
         mapping.key = idx;
-        mapping.hasHeader = true;
-      } else if (clean.includes('summary') || clean.includes('description') || clean.includes('work')) {
+        matchedHeaderCount++;
+      } else if (clean === 'summary' || clean === 'description' || clean === 'work' || clean === 'workitem' || clean === 'workitems' || clean.includes('summary')) {
         // Jira's modern search results label the column "Work" (which contains Key + Summary)
         mapping.summary = idx;
         if (mapping.key === -1) mapping.key = idx;
-        mapping.hasHeader = true;
-      } else if (clean.includes('created') || clean.includes('create')) {
+        matchedHeaderCount++;
+      } else if (clean === 'created' || clean === 'datecreated' || clean.includes('created')) {
         mapping.dateCreated = idx;
-        mapping.hasHeader = true;
-      } else if (clean.includes('severity') || clean.includes('priority') || clean === 'sev') {
+        matchedHeaderCount++;
+      } else if (clean === 'severity' || clean === 'priority' || clean === 'sev' || clean.includes('severity')) {
         mapping.severity = idx;
-        mapping.hasHeader = true;
-      } else if (clean.includes('status')) {
+        matchedHeaderCount++;
+      } else if (clean === 'status' || clean.includes('status')) {
         mapping.status = idx;
-        mapping.hasHeader = true;
-      } else if (clean.includes('reopen')) {
+        matchedHeaderCount++;
+      } else if (clean === 'reopen' || clean === 'reopened' || clean.includes('reopen')) {
         mapping.reopened = idx;
-        mapping.hasHeader = true;
-      } else if (clean.includes('age')) {
+        matchedHeaderCount++;
+      } else if (clean === 'age' || clean.includes('age')) {
         mapping.age = idx;
-        mapping.hasHeader = true;
+        matchedHeaderCount++;
       }
     });
 
+    // Only classify as a genuine header row if at least 2 recognized header columns match
+    mapping.hasHeader = matchedHeaderCount >= 2;
     return mapping;
   },
 

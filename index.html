@@ -92,7 +92,7 @@
               </button>
             </div>
             <small style="color:var(--text-muted);font-size:11px;display:block;margin-top:4px">
-              Auto-generated from IDEA key (or Epic key). Used in email Links section.
+              Auto-generated from Epic key (or IDEA key if no Epic provided). Used in email Links section.
             </small>
           </div>
         </div>
@@ -206,7 +206,6 @@
             <button type="button" class="btn btn-secondary" onclick="refreshScorecardLive()" title="Recalculate quality scorecard live from active defect data">
               <span>🔄 Refresh Scorecard</span>
             </button>
-            <button type="button" class="btn btn-secondary" onclick="addBugRow()">+ Add Bug</button>
           </div>
         </div>
         <div class="data-table-wrapper">
@@ -225,6 +224,13 @@
               </tr>
             </thead>
             <tbody id="bugs-tbody"></tbody>
+            <tfoot>
+              <tr class="quick-add-row">
+                <td colspan="9" style="padding:10px 14px;background:#f8fafc;border-top:1px dashed var(--border)">
+                  <button type="button" id="btn-quick-add-bug" class="btn btn-secondary" onclick="addBugRow()" title="Add New Defect Row">+ Add Bug</button>
+                </td>
+              </tr>
+            </tfoot>
           </table>
         </div>
         <div style="margin-top:20px;display:flex;justify-content:space-between">
@@ -345,7 +351,7 @@
           </div>
           <div class="import-step">
             <span class="step-num">2</span>
-            <span>Highlight the defect rows with your mouse and press <kbd>Cmd+C</kbd> / <kbd>Ctrl+C</kbd>.</span>
+            <span>Highlight the defect rows (with or without column headers) and press <kbd>Cmd+C</kbd> / <kbd>Ctrl+C</kbd>.</span>
           </div>
           <div class="import-step">
             <span class="step-num">3</span>
@@ -402,6 +408,6 @@
   <div id="toast" class="toast"></div>
 
   <!-- ES Module Application Entrypoint -->
-  <script type="module" src="js/app.js?v=20"></script>
+  <script type="module" src="js/app.js?v=21"></script>
 </body>
 </html>
