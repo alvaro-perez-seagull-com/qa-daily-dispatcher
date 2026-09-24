@@ -83,7 +83,7 @@ export const JiraImporter = {
           if (name === 'age' && val) {
             const floatVal = parseFloat(val);
             if (!isNaN(floatVal)) {
-              age = Math.max(0, Math.ceil(floatVal));
+              age = Math.max(0, floatVal);
             }
           } else if (name === 'severity' && val) {
             severity = this.normalizeSeverity(val);
@@ -135,7 +135,7 @@ export const JiraImporter = {
       const ageRaw = fields.customfield_18008 || item.age;
       if (ageRaw !== undefined && ageRaw !== null && ageRaw !== '') {
         const floatVal = parseFloat(String(ageRaw));
-        if (!isNaN(floatVal)) age = Math.max(0, Math.ceil(floatVal));
+        if (!isNaN(floatVal)) age = Math.max(0, floatVal);
       }
       if (age === null) {
         age = this.calculateAgeFallback(dateCreated);

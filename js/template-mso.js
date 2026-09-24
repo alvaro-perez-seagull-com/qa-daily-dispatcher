@@ -1,9 +1,9 @@
-import { SectionIntro } from './section-intro.js?v=15';
-import { SectionSummary } from './section-summary.js?v=15';
-import { SectionScorecard } from './section-scorecard.js?v=15';
-import { SectionBugsChart } from './section-bugs-chart.js?v=15';
-import { SectionBugsList } from './section-bugs-list.js?v=15';
-import { SectionLinks } from './section-links.js?v=15';
+import { SectionIntro } from './section-intro.js?v=16';
+import { SectionSummary } from './section-summary.js?v=16';
+import { SectionScorecard } from './section-scorecard.js?v=16';
+import { SectionBugsChart } from './section-bugs-chart.js?v=16';
+import { SectionBugsList } from './section-bugs-list.js?v=16';
+import { SectionLinks } from './section-links.js?v=16';
 
 /**
  * Master Template Assembler
@@ -66,10 +66,40 @@ w\\:* {behavior:url(#default#VML);}
  @font-face {font-family:Arial;}
  /* Style Definitions */
  p.MsoNormal, li.MsoNormal, div.MsoNormal
-	{margin:0in; font-size:12.0pt; font-family:"Aptos",sans-serif;}
- h2
-	{margin-top:8.0pt; margin-right:0in; margin-bottom:4.0pt; margin-left:0in;
-	font-size:16.0pt; font-family:"Aptos Display",sans-serif; color:#0F4761; font-weight:normal;}
+	{mso-style-unhide:no;
+	mso-style-qformat:yes;
+	mso-style-parent:"";
+	margin:0in;
+	font-size:12.0pt;
+	font-family:"Aptos",sans-serif;}
+ h2, p.MsoHeading2, li.MsoHeading2, div.MsoHeading2
+	{mso-style-name:"Heading 2";
+	mso-style-priority:9;
+	mso-style-unhide:no;
+	mso-style-qformat:yes;
+	mso-style-link:"Heading 2 Char";
+	mso-style-next:Normal;
+	margin-top:12.0pt;
+	margin-right:0in;
+	margin-bottom:6.0pt;
+	margin-left:0in;
+	page-break-after:avoid;
+	mso-outline-level:2;
+	font-size:15.0pt;
+	font-family:"Segoe UI",Arial,sans-serif;
+	mso-fareast-font-family:"Times New Roman";
+	color:#0F4761;
+	font-weight:bold;}
+ span.Heading2Char
+	{mso-style-name:"Heading 2 Char";
+	mso-style-priority:9;
+	mso-style-unhide:no;
+	mso-style-locked:yes;
+	mso-style-link:"Heading 2";
+	font-family:"Segoe UI",Arial,sans-serif;
+	mso-fareast-font-family:"Times New Roman";
+	color:#0F4761;
+	font-weight:bold;}
  a:link, span.MsoHyperlink {color:#467886; text-decoration:underline;}
  a:visited, span.MsoHyperlinkFollowed {color:#96607D; text-decoration:underline;}
  p.MsoListParagraph, li.MsoListParagraph, div.MsoListParagraph

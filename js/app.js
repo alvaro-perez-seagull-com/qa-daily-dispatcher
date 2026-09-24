@@ -1,12 +1,12 @@
-import { SectionIntro } from './section-intro.js?v=15';
-import { SectionSummary } from './section-summary.js?v=15';
-import { SectionScorecard } from './section-scorecard.js?v=15';
-import { SectionBugsChart } from './section-bugs-chart.js?v=15';
-import { SectionBugsList } from './section-bugs-list.js?v=15';
-import { SectionLinks } from './section-links.js?v=15';
-import { TemplateMso } from './template-mso.js?v=15';
-import { ClipboardHelper } from './clipboard.js?v=15';
-import { JiraImporter } from './jira-importer.js?v=15';
+import { SectionIntro } from './section-intro.js?v=16';
+import { SectionSummary } from './section-summary.js?v=16';
+import { SectionScorecard } from './section-scorecard.js?v=16';
+import { SectionBugsChart } from './section-bugs-chart.js?v=16';
+import { SectionBugsList } from './section-bugs-list.js?v=16';
+import { SectionLinks } from './section-links.js?v=16';
+import { TemplateMso } from './template-mso.js?v=16';
+import { ClipboardHelper } from './clipboard.js?v=16';
+import { JiraImporter } from './jira-importer.js?v=16';
 
 const STORAGE_KEY = 'seagull_dispatcher_v1';
 
