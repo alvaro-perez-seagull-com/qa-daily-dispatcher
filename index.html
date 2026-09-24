@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Seagull QA Daily Dispatcher</title>
-  <link rel="stylesheet" href="css/styles.css?v=4">
+  <link rel="stylesheet" href="css/styles.css?v=5">
 </head>
 <body>
   <div class="app-container">
@@ -50,31 +50,44 @@
           </div>
           <div class="form-group">
             <label>Feature Initiative Name</label>
-            <input type="text" id="input-feature-name" class="form-control" placeholder="e.g. Intelligent Forms: Refreshable Print Preview">
+            <input type="text" id="input-feature-name" class="form-control" placeholder="e.g. Intelligent Forms: Refreshable Print Preview" oninput="handleSanitizedTextInput(this, 250)" onblur="handleSanitizedTextBlur(this, 250)">
           </div>
           <div class="grid-2">
             <div class="form-group">
-              <label>Product Version</label>
-              <input type="text" id="input-product-version" class="form-control" placeholder="e.g. BTC v12.6" oninput="handleProductVersionInput(this.value)">
+              <label>Product and Version</label>
+              <input type="text" id="input-product-version" class="form-control" placeholder="e.g. BTC v12.6" oninput="handleProductVersionInput(this.value)" onblur="handleSanitizedTextBlur(this, 50)">
             </div>
             <div class="form-group">
               <label>Execution Start Date</label>
-              <input type="text" id="input-start-date" class="form-control" placeholder="MM/DD/YYYY" maxlength="10" oninput="handleDateInput(this)" onblur="handleDateBlur(this)">
-              <small id="start-date-error" style="color:var(--accent-red);font-size:11px;display:none;margin-top:4px">Please enter a valid full date in MM/DD/YYYY format</small>
+              <div class="input-action-group date-picker-group">
+                <input type="text" id="input-start-date" class="form-control" placeholder="MM/DD/YYYY" maxlength="10" oninput="handleDateInput(this)" onblur="handleDateBlur(this)" onkeydown="handleDateKeyDown(event)">
+                <input type="date" id="native-date-picker" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0" tabindex="-1" onchange="handleNativeDateSelect(this.value)">
+                <button type="button" class="btn-input-action" onclick="openNativeDatePicker()" title="Select date from calendar" aria-label="Open Calendar">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                </button>
+              </div>
+              <small id="start-date-error" class="field-error-msg" style="display:none">Please enter a valid full date in MM/DD/YYYY format</small>
             </div>
           </div>
           <div class="grid-2">
             <div class="form-group">
               <label>IDEA Jira Key</label>
               <input type="text" id="input-idea-key" class="form-control" placeholder="IDEA-3110" oninput="handleKeyInput('idea', this.value)">
-              <small style="color:var(--text-muted);font-size:11px;display:block;margin-top:4px">
+              <small id="idea-key-error" class="field-error-msg" style="display:none">Must follow format IDEA-&lt;number&gt; (e.g. IDEA-3110)</small>
+              <small id="idea-key-hint" style="color:var(--text-muted);font-size:11px;display:block;margin-top:4px">
                 Paste key or full Jira URL (auto-extracts)
               </small>
             </div>
             <div class="form-group">
               <label>Epic Jira Key</label>
               <input type="text" id="input-epic-key" class="form-control" placeholder="BPLAT-20767" oninput="handleKeyInput('epic', this.value)">
-              <small style="color:var(--text-muted);font-size:11px;display:block;margin-top:4px">
+              <small id="epic-key-error" class="field-error-msg" style="display:none">Must follow format BPLAT-&lt;number&gt; (e.g. BPLAT-20767)</small>
+              <small id="epic-key-hint" style="color:var(--text-muted);font-size:11px;display:block;margin-top:4px">
                 Paste key or full Jira URL (auto-extracts)
               </small>
             </div>
@@ -83,12 +96,18 @@
             <label>JIRA - List of Bugs Filter URL</label>
             <div class="input-action-group">
               <input type="text" id="input-filter-url" class="form-control" readonly placeholder="Auto-generated based on Jira Key..." style="background:var(--bg-subtle);cursor:default">
-              <button type="button" class="btn btn-secondary" onclick="copyFilterUrl()" title="Copy Filter URL to Clipboard" style="white-space:nowrap;display:inline-flex;align-items:center;gap:6px">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <button type="button" id="btn-copy-filter-url" class="btn-input-action" onclick="copyFilterUrl()" title="Copy Filter URL to Clipboard" aria-label="Copy Filter URL" disabled>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                   <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                 </svg>
-                Copy URL
+              </button>
+              <button type="button" id="btn-open-filter-url" class="btn-input-action" onclick="openFilterUrlFromSetup()" title="Open Filter in Jira ↗" aria-label="Open Filter in Jira" disabled>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
               </button>
             </div>
             <small style="color:var(--text-muted);font-size:11px;display:block;margin-top:4px">
@@ -103,7 +122,7 @@
           </div>
           <div class="form-group">
             <label>QA Engineer Name</label>
-            <input type="text" id="input-sender-name" class="form-control" placeholder="Alvaro Perez">
+            <input type="text" id="input-sender-name" class="form-control" placeholder="Alvaro Perez" oninput="handleSanitizedTextInput(this, 100)" onblur="handleSanitizedTextBlur(this, 100)">
           </div>
           <div class="form-group">
             <label>
@@ -115,7 +134,7 @@
                 </span>
               </span>
             </label>
-            <input type="number" id="input-sp" class="form-control" placeholder="3.5" min="0.1" step="any">
+            <input type="number" id="input-sp" class="form-control" placeholder="e.g. 22" min="0.1" step="any">
           </div>
           <div style="margin-top:20px;padding:14px;background:var(--bg-subtle);border-radius:8px;border:1px solid var(--border);font-size:12px;color:var(--text-muted);line-height:1.5">
             <strong style="color:var(--primary);display:block;margin-bottom:4px">💡 Outlook Distribution:</strong>
@@ -408,6 +427,6 @@
   <div id="toast" class="toast"></div>
 
   <!-- ES Module Application Entrypoint -->
-  <script type="module" src="js/app.js?v=21"></script>
+  <script type="module" src="js/app.js?v=23"></script>
 </body>
 </html>

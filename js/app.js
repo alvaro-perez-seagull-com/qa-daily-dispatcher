@@ -1,12 +1,12 @@
-import { SectionIntro } from './section-intro.js?v=21';
-import { SectionSummary } from './section-summary.js?v=21';
-import { SectionScorecard } from './section-scorecard.js?v=21';
-import { SectionBugsChart } from './section-bugs-chart.js?v=21';
-import { SectionBugsList } from './section-bugs-list.js?v=21';
-import { SectionLinks } from './section-links.js?v=21';
-import { TemplateMso } from './template-mso.js?v=21';
-import { ClipboardHelper } from './clipboard.js?v=21';
-import { JiraImporter } from './jira-importer.js?v=21';
+import { SectionIntro } from './section-intro.js?v=22';
+import { SectionSummary } from './section-summary.js?v=22';
+import { SectionScorecard } from './section-scorecard.js?v=22';
+import { SectionBugsChart } from './section-bugs-chart.js?v=22';
+import { SectionBugsList } from './section-bugs-list.js?v=22';
+import { SectionLinks } from './section-links.js?v=22';
+import { TemplateMso } from './template-mso.js?v=22';
+import { ClipboardHelper } from './clipboard.js?v=22';
+import { JiraImporter } from './jira-importer.js?v=22';
 
 const STORAGE_KEY = 'seagull_dispatcher_v1';
 
@@ -79,6 +79,48 @@ function extractKey(val) {
   return trimmed.toUpperCase();
 }
 
+// Security Sanitization Utility: Prevents XSS, Script Injection, and SQL Injection Tokens
+function sanitizeTextInput(val, maxLen = 250) {
+  if (!val) return '';
+  let str = String(val);
+
+  // 1. Remove null bytes
+  str = str.replace(/\0/g, '');
+
+  // 2. Strip HTML tags and script/iframe/style blocks
+  str = str.replace(/<\s*script[^>]*>[\s\S]*?<\s*\/\s*script\s*>/gi, '');
+  str = str.replace(/<\s*iframe[^>]*>[\s\S]*?<\s*\/\s*iframe\s*>/gi, '');
+  str = str.replace(/<\s*style[^>]*>[\s\S]*?<\s*\/\s*style\s*>/gi, '');
+  str = str.replace(/<[^>]+>/g, '');
+
+  // 3. Strip pseudo-protocols and inline event attributes
+  str = str.replace(/javascript:/gi, '');
+  str = str.replace(/vbscript:/gi, '');
+  str = str.replace(/data:text\/html/gi, '');
+  str = str.replace(/on\w+\s*=/gi, '');
+
+  // 4. Neutralize SQL injection tokens (comments and statement chaining)
+  str = str.replace(/--+/g, '-');
+  str = str.replace(/\/\*[\s\S]*?\*\//g, '');
+  str = str.replace(/;\s*(drop|alter|delete|insert|update|select|truncate|exec|execute)\b/gi, '');
+  str = str.replace(/\b(or|and)\s+['"]?1['"]?\s*=\s*['"]?1/gi, '');
+
+  // 5. Truncate to maximum length and trim
+  return str.slice(0, maxLen).trim();
+}
+
+window.handleSanitizedTextInput = function(input, maxLen = 250) {
+  if (input.value.includes('<') || input.value.toLowerCase().includes('javascript:') || input.value.includes('--')) {
+    input.value = sanitizeTextInput(input.value, maxLen);
+  }
+  syncInputsToState();
+};
+
+window.handleSanitizedTextBlur = function(input, maxLen = 250) {
+  input.value = sanitizeTextInput(input.value, maxLen);
+  syncInputsToState();
+};
+
 // Smart Date Parsing, Formatting, and Validation (MM/DD/YYYY)
 function parseAndFormatDate(val) {
   if (!val) return { formatted: '', valid: true, empty: true };
@@ -150,7 +192,66 @@ function validateAndBuildDate(month, day, year) {
   return { formatted: `${mm}/${dd}/${yyyy}`, valid: true, empty: false };
 }
 
+// Keyboard Guard: Numeric and slash only for Execution Start Date
+window.handleDateKeyDown = function(event) {
+  const allowedKeys = [
+    'Backspace', 'Delete', 'Tab', 'Escape', 'Enter',
+    'ArrowLeft', 'ArrowRight', 'Home', 'End'
+  ];
+  if (allowedKeys.includes(event.key) || event.ctrlKey || event.metaKey) {
+    return;
+  }
+  // Allow digits 0-9 and slash /
+  if (/^[0-9\/]$/.test(event.key)) {
+    return;
+  }
+  event.preventDefault();
+};
+
+// Native Calendar Date Picker Integration
+window.openNativeDatePicker = function() {
+  const datePicker = document.getElementById('native-date-picker');
+  const textInput = document.getElementById('input-start-date');
+  if (!datePicker) return;
+
+  const curVal = (textInput?.value || '').trim();
+  if (curVal) {
+    const parts = curVal.split('/');
+    if (parts.length === 3 && parts[2].length === 4) {
+      datePicker.value = `${parts[2]}-${parts[0].padStart(2, '0')}-${parts[1].padStart(2, '0')}`;
+    }
+  }
+
+  if (typeof datePicker.showPicker === 'function') {
+    datePicker.showPicker();
+  } else {
+    datePicker.focus();
+    datePicker.click();
+  }
+};
+
+window.handleNativeDateSelect = function(isoVal) {
+  if (!isoVal) return;
+  const parts = isoVal.split('-');
+  if (parts.length === 3) {
+    const formatted = `${parts[1]}/${parts[2]}/${parts[0]}`;
+    const textInput = document.getElementById('input-start-date');
+    if (textInput) {
+      textInput.value = formatted;
+      textInput.classList.remove('input-error');
+    }
+    const errEl = document.getElementById('start-date-error');
+    if (errEl) errEl.style.display = 'none';
+
+    state.introData.executionStartDate = formatted;
+    saveState();
+  }
+};
+
 window.handleDateInput = function(input) {
+  // Strip any characters that are not numeric or slash
+  input.value = input.value.replace(/[^0-9\/]/g, '');
+
   const val = input.value;
   // If user pasted or typed 8 raw digits (e.g. 09222026), auto-format immediately
   const rawDigits = val.replace(/\D/g, '');
@@ -197,23 +298,56 @@ window.handleDateBlur = function(input) {
   }
 };
 
-// Validation Gate: Require IDEA Key OR Epic Key (or both)
+// Strict Key Format Validators
+// IDEA: IDEA-<digits> (e.g. IDEA-3110)
+// EPIC: BPLAT-<digits> (e.g. BPLAT-20767)
+function validateKeyFormat(type, rawVal) {
+  if (!rawVal || !rawVal.trim()) {
+    return { valid: true, empty: true, cleanKey: '', error: null };
+  }
+
+  const cleanKey = extractKey(rawVal);
+  if (type === 'idea') {
+    const isMatch = /^IDEA-\d+$/i.test(cleanKey);
+    return {
+      valid: isMatch,
+      empty: false,
+      cleanKey: cleanKey.toUpperCase(),
+      error: isMatch ? null : 'Must follow format IDEA-<number> (e.g. IDEA-3110)'
+    };
+  } else if (type === 'epic') {
+    const isMatch = /^BPLAT-\d+$/i.test(cleanKey);
+    return {
+      valid: isMatch,
+      empty: false,
+      cleanKey: cleanKey.toUpperCase(),
+      error: isMatch ? null : 'Must follow format BPLAT-<number> (e.g. BPLAT-20767)'
+    };
+  }
+  return { valid: false, empty: false, cleanKey, error: 'Unknown key type' };
+}
+
+// Validation Gate: Require at least ONE valid key (IDEA or Epic), and NO invalid keys
 function validateKeyGate(showUI = false) {
   const ideaInput = document.getElementById('input-idea-key');
   const epicInput = document.getElementById('input-epic-key');
-  const idea = (ideaInput ? ideaInput.value : (state.introData.ideaKey || '')).trim();
-  const epic = (epicInput ? epicInput.value : (state.introData.epicKey || '')).trim();
-  const isValid = Boolean(idea || epic);
+  const ideaVal = (ideaInput ? ideaInput.value : (state.introData.ideaKey || '')).trim();
+  const epicVal = (epicInput ? epicInput.value : (state.introData.epicKey || '')).trim();
+
+  const ideaCheck = validateKeyFormat('idea', ideaVal);
+  const epicCheck = validateKeyFormat('epic', epicVal);
+
+  const hasAtLeastOneKey = (!ideaCheck.empty && ideaCheck.valid) || (!epicCheck.empty && epicCheck.valid);
+  const hasNoInvalidKeys = ideaCheck.valid && epicCheck.valid;
+  const isValid = hasAtLeastOneKey && hasNoInvalidKeys;
 
   const banner = document.getElementById('setup-validation-banner');
   const continueBtn = document.getElementById('btn-continue-cycles');
 
-  // Dynamically enable or disable the Continue to Cycles button
   if (continueBtn) {
     continueBtn.disabled = !isValid;
   }
 
-  // Update tabs visual locked state
   document.querySelectorAll('.tab-btn').forEach(btn => {
     if (btn.dataset.tab !== 'setup') {
       btn.classList.toggle('tab-locked', !isValid);
@@ -222,12 +356,12 @@ function validateKeyGate(showUI = false) {
 
   if (!isValid && showUI) {
     banner?.classList.add('show');
-    ideaInput?.classList.add('input-error');
-    epicInput?.classList.add('input-error');
-  } else if (isValid) {
+    if (!ideaCheck.valid) ideaInput?.classList.add('input-error');
+    if (!epicCheck.valid) epicInput?.classList.add('input-error');
+  } else if (isValid || !showUI) {
     banner?.classList.remove('show');
-    ideaInput?.classList.remove('input-error');
-    epicInput?.classList.remove('input-error');
+    if (ideaCheck.valid) ideaInput?.classList.remove('input-error');
+    if (epicCheck.valid) epicInput?.classList.remove('input-error');
   }
 
   return isValid;
@@ -238,7 +372,7 @@ window.switchTab = function(tabName) {
   if (tabName !== 'setup') {
     syncInputsToState();
     if (!validateKeyGate(true)) {
-      showToast('⚠️ Please enter an IDEA Key or Epic Key (or both) before proceeding.');
+      showToast('⚠️ Please enter a valid IDEA Key or Epic Key (or both) before proceeding.');
       document.getElementById('input-idea-key')?.focus();
       return;
     }
@@ -258,59 +392,122 @@ window.switchTab = function(tabName) {
 window.proceedToCycles = function() {
   syncInputsToState();
   if (!validateKeyGate(true)) {
-    showToast('⚠️ Please enter an IDEA Key or Epic Key (or both) before proceeding.');
+    showToast('⚠️ Please enter a valid IDEA Key or Epic Key (or both) before proceeding.');
     document.getElementById('input-idea-key')?.focus();
     return;
   }
   window.switchTab('summary');
 };
 
-// Dynamically update the Jira bug filter URL based on active key (IDEA key > Epic key)
+// Dynamically update the Jira bug filter URL based on active key (Epic key > IDEA key)
 function updateFilterUrl() {
   const ideaInput = document.getElementById('input-idea-key');
   const epicInput = document.getElementById('input-epic-key');
-  const idea = (ideaInput ? ideaInput.value : (state.introData.ideaKey || '')).trim();
-  const epic = (epicInput ? epicInput.value : (state.introData.epicKey || '')).trim();
+  const ideaVal = (ideaInput ? ideaInput.value : (state.introData.ideaKey || '')).trim();
+  const epicVal = (epicInput ? epicInput.value : (state.introData.epicKey || '')).trim();
   const version = (document.getElementById('input-product-version')?.value || state.introData.productVersion || 'BTC v12.6').trim();
 
-  // Priority: EPIC JIRA Key > IDEA JIRA Key (Epics scope defects to the specific sprint/release)
-  const activeKey = epic || idea;
-  const generatedUrl = activeKey ? SectionLinks.generateFilterUrl(activeKey, version) : '';
+  const ideaCheck = validateKeyFormat('idea', ideaVal);
+  const epicCheck = validateKeyFormat('epic', epicVal);
 
+  // Active key selection (Epic has precedence if valid, else Idea if valid)
+  let activeKey = '';
+  if (!epicCheck.empty && epicCheck.valid) {
+    activeKey = epicCheck.cleanKey;
+  } else if (!ideaCheck.empty && ideaCheck.valid) {
+    activeKey = ideaCheck.cleanKey;
+  }
+
+  const generatedUrl = activeKey ? SectionLinks.generateFilterUrl(activeKey, version) : '';
   state.links.filterUrl = generatedUrl;
+
   const filterInput = document.getElementById('input-filter-url');
   if (filterInput) {
     filterInput.value = generatedUrl;
   }
+
+  const copyBtn = document.getElementById('btn-copy-filter-url');
+  const openBtn = document.getElementById('btn-open-filter-url');
+  const hasUrl = Boolean(generatedUrl);
+  if (copyBtn) copyBtn.disabled = !hasUrl;
+  if (openBtn) openBtn.disabled = !hasUrl;
 }
 
 window.copyFilterUrl = async function() {
   const url = document.getElementById('input-filter-url')?.value;
   if (!url) {
-    showToast('⚠️ No filter URL generated yet. Enter an IDEA or Epic key first.');
+    showToast('⚠️ No filter URL generated yet. Enter a valid IDEA or Epic key first.');
     return;
   }
   const result = await ClipboardHelper.copyText(url);
   showToast(result.success ? 'Copied List of Bugs filter URL to clipboard!' : 'Failed to copy URL.');
 };
 
-window.handleKeyInput = function(type, rawVal) {
-  const cleanKey = extractKey(rawVal);
-  if (type === 'idea') {
-    if (rawVal !== cleanKey && (rawVal.includes('/') || rawVal.includes('http') || rawVal.includes(':'))) {
-      document.getElementById('input-idea-key').value = cleanKey;
-    }
-    state.introData.ideaKey = cleanKey;
-    state.links.ideaKey = cleanKey;
-    state.links.ideaUrl = cleanKey ? `https://mojixinc.atlassian.net/browse/${cleanKey}` : '';
-  } else if (type === 'epic') {
-    if (rawVal !== cleanKey && (rawVal.includes('/') || rawVal.includes('http') || rawVal.includes(':'))) {
-      document.getElementById('input-epic-key').value = cleanKey;
-    }
-    state.introData.epicKey = cleanKey;
-    state.links.epicKey = cleanKey;
-    state.links.epicUrl = cleanKey ? `https://mojixinc.atlassian.net/browse/${cleanKey}` : '';
+window.openFilterUrlFromSetup = function() {
+  const url = document.getElementById('input-filter-url')?.value;
+  if (!url) {
+    showToast('⚠️ No filter URL generated yet. Enter a valid IDEA or Epic key first.');
+    return;
   }
+  window.open(url, '_blank', 'noopener,noreferrer');
+};
+
+window.handleKeyInput = function(type, rawVal) {
+  const result = validateKeyFormat(type, rawVal);
+  const inputEl = document.getElementById(`input-${type}-key`);
+  const errorEl = document.getElementById(`${type}-key-error`);
+  const hintEl = document.getElementById(`${type}-key-hint`);
+
+  // If user pasted a URL, replace field value with extracted key
+  if (rawVal && (rawVal.includes('/') || rawVal.includes('http') || rawVal.includes(':'))) {
+    if (inputEl) inputEl.value = result.cleanKey;
+  }
+
+  if (result.empty) {
+    if (errorEl) errorEl.style.display = 'none';
+    if (hintEl) hintEl.style.display = 'block';
+    inputEl?.classList.remove('input-error');
+    if (type === 'idea') {
+      state.introData.ideaKey = '';
+      state.links.ideaKey = '';
+      state.links.ideaUrl = '';
+    } else {
+      state.introData.epicKey = '';
+      state.links.epicKey = '';
+      state.links.epicUrl = '';
+    }
+  } else if (result.valid) {
+    if (errorEl) errorEl.style.display = 'none';
+    if (hintEl) hintEl.style.display = 'block';
+    inputEl?.classList.remove('input-error');
+    if (type === 'idea') {
+      state.introData.ideaKey = result.cleanKey;
+      state.links.ideaKey = result.cleanKey;
+      state.links.ideaUrl = `https://mojixinc.atlassian.net/browse/${result.cleanKey}`;
+    } else {
+      state.introData.epicKey = result.cleanKey;
+      state.links.epicKey = result.cleanKey;
+      state.links.epicUrl = `https://mojixinc.atlassian.net/browse/${result.cleanKey}`;
+    }
+  } else {
+    // Invalid key format
+    if (errorEl) {
+      errorEl.textContent = result.error;
+      errorEl.style.display = 'block';
+    }
+    if (hintEl) hintEl.style.display = 'none';
+    inputEl?.classList.add('input-error');
+    if (type === 'idea') {
+      state.introData.ideaKey = '';
+      state.links.ideaKey = '';
+      state.links.ideaUrl = '';
+    } else {
+      state.introData.epicKey = '';
+      state.links.epicKey = '';
+      state.links.epicUrl = '';
+    }
+  }
+
   updateFilterUrl();
   validateKeyGate(false);
   renderLiveStats();
@@ -341,14 +538,14 @@ window.confirmResetForm = function() {
     console.warn("Could not clear localStorage:", e);
   }
 
-  // Reset to initial blank defaults
+  // Reset to initial blank defaults (all fields wiped)
   state.introData = {
-    senderName: "Alvaro Perez",
+    senderName: "",
     senderEmail: "aperez@seagullsoftware.com",
     sentDate: new Date(),
     toRecipients: [],
     ccRecipients: [],
-    productVersion: "BTC v12.6",
+    productVersion: "",
     ideaKey: "",
     epicKey: "",
     featureName: "",
@@ -364,11 +561,31 @@ window.confirmResetForm = function() {
     filterUrl: ""
   };
   state.scorecardParams = {
-    storyPoints: 22,
+    storyPoints: null,
     reopened: 0,
     closed: 0,
     escaped: { s1: 0, s2: 0, s3: 0, s4: 0, s5: 0 }
   };
+
+  saveState();
+
+  // Clear validation error displays and restore hints
+  const ideaErr = document.getElementById('idea-key-error');
+  const ideaHint = document.getElementById('idea-key-hint');
+  const epicErr = document.getElementById('epic-key-error');
+  const epicHint = document.getElementById('epic-key-hint');
+  const dateErr = document.getElementById('start-date-error');
+  if (ideaErr) ideaErr.style.display = 'none';
+  if (ideaHint) ideaHint.style.display = 'block';
+  if (epicErr) epicErr.style.display = 'none';
+  if (epicHint) epicHint.style.display = 'block';
+  if (dateErr) dateErr.style.display = 'none';
+
+  document.getElementById('input-idea-key')?.classList.remove('input-error');
+  document.getElementById('input-epic-key')?.classList.remove('input-error');
+  document.getElementById('input-start-date')?.classList.remove('input-error');
+  const nativePicker = document.getElementById('native-date-picker');
+  if (nativePicker) nativePicker.value = '';
 
   renderSetupForm();
   renderCyclesTable();
@@ -376,8 +593,10 @@ window.confirmResetForm = function() {
   renderLiveStats();
   updateFilterUrl();
   validateKeyGate(false);
+  renderPreview();
+  window.switchTab('setup');
   closeResetModal();
-  showToast("Form has been reset to defaults.");
+  showToast("All fields and sections have been reset.");
 };
 
 window.copyEmailToClipboard = async function() {
@@ -480,9 +699,14 @@ window.removeBugRow = function(index) {
 
 // Sync Form inputs to State
 function syncInputsToState() {
-  state.introData.senderName = document.getElementById('input-sender-name')?.value || state.introData.senderName;
-  state.introData.productVersion = document.getElementById('input-product-version')?.value || state.introData.productVersion;
-  state.introData.featureName = document.getElementById('input-feature-name')?.value || state.introData.featureName;
+  const senderInput = document.getElementById('input-sender-name');
+  if (senderInput) state.introData.senderName = sanitizeTextInput(senderInput.value, 100);
+
+  const versionInput = document.getElementById('input-product-version');
+  if (versionInput) state.introData.productVersion = sanitizeTextInput(versionInput.value, 50);
+
+  const featureInput = document.getElementById('input-feature-name');
+  if (featureInput) state.introData.featureName = sanitizeTextInput(featureInput.value, 250);
   
   const rawDate = document.getElementById('input-start-date')?.value?.trim();
   if (rawDate) {
@@ -494,8 +718,11 @@ function syncInputsToState() {
 
   const ideaInput = document.getElementById('input-idea-key');
   const epicInput = document.getElementById('input-epic-key');
-  const ideaKey = ideaInput ? extractKey(ideaInput.value) : (state.introData.ideaKey || '');
-  const epicKey = epicInput ? extractKey(epicInput.value) : (state.introData.epicKey || '');
+  const ideaCheck = validateKeyFormat('idea', ideaInput ? ideaInput.value : '');
+  const epicCheck = validateKeyFormat('epic', epicInput ? epicInput.value : '');
+
+  const ideaKey = (!ideaCheck.empty && ideaCheck.valid) ? ideaCheck.cleanKey : '';
+  const epicKey = (!epicCheck.empty && epicCheck.valid) ? epicCheck.cleanKey : '';
 
   state.introData.ideaKey = ideaKey;
   state.introData.epicKey = epicKey;
@@ -507,10 +734,13 @@ function syncInputsToState() {
   state.links.filterUrl = document.getElementById('input-filter-url')?.value || '';
 
   const spInput = document.getElementById('input-sp');
-  if (spInput && spInput.value.trim() !== '') {
-    const spVal = parseFloat(spInput.value);
-    if (!isNaN(spVal) && spVal > 0) {
-      state.scorecardParams.storyPoints = spVal;
+  if (spInput) {
+    const rawSp = spInput.value.trim();
+    if (rawSp === '') {
+      state.scorecardParams.storyPoints = null;
+    } else {
+      const spVal = parseFloat(rawSp);
+      state.scorecardParams.storyPoints = (!isNaN(spVal) && spVal > 0) ? spVal : null;
     }
   }
 
@@ -526,7 +756,7 @@ function renderSetupForm() {
   document.getElementById('input-idea-key').value = state.introData.ideaKey || '';
   document.getElementById('input-epic-key').value = state.introData.epicKey || '';
   updateFilterUrl();
-  document.getElementById('input-sp').value = state.scorecardParams.storyPoints || 22;
+  document.getElementById('input-sp').value = (state.scorecardParams.storyPoints !== null && state.scorecardParams.storyPoints !== undefined) ? state.scorecardParams.storyPoints : '';
 }
 
 // Area & Zephyr Key Change Handler

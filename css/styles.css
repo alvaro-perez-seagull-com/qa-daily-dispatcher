@@ -290,6 +290,53 @@ textarea.form-control {
   flex: 1;
 }
 
+.date-picker-group {
+  position: relative;
+}
+
+.btn-input-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.btn-input-action:hover:not(:disabled) {
+  background: var(--bg-subtle);
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+}
+
+.btn-input-action:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn-input-action:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  background: var(--bg-subtle);
+  border-color: var(--border);
+  color: var(--text-muted);
+}
+
+.field-error-msg {
+  color: var(--accent-red);
+  font-size: 11px;
+  display: block;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
 /* Buttons */
 .btn {
   display: inline-flex;
