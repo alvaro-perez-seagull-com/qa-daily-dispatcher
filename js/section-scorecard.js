@@ -12,6 +12,53 @@ export const SectionScorecard = {
   },
 
   /**
+   * Linear tier interpolation (Excellent 100-75, Good 75-50, Moderate 50-25, Poor 25-0)
+   * Matching Christian Velasco's exact QA Scorecard engine
+   */
+  scoreTier(val, thresholds) {
+    const v = Math.max(0, Number(val) || 0);
+    const [exc, good, mod] = thresholds;
+
+    if (v === 0) return 100;
+
+    // Zero-tolerance threshold (e.g. S1 Showstopper rate)
+    if (exc === 0 && good === 0 && mod === 0) {
+      return v === 0 ? 100 : 0;
+    }
+
+    // Zero-lower bound with non-zero upper bounds (e.g. S2 Critical)
+    if (exc === 0) {
+      if (v <= good) {
+        return 75 - (v / good) * 25;
+      }
+      if (v <= mod) {
+        return 50 - ((v - good) / (mod - good)) * 25;
+      }
+      const poorSpan = (mod - good > 0) ? (mod - good) : 0.05;
+      return Math.max(0, 25 - ((v - mod) / poorSpan) * 25);
+    }
+
+    // Excellent tier (0 to exc): maps 100 down to 75
+    if (v <= exc) {
+      return 100 - (v / exc) * 25;
+    }
+
+    // Good tier (exc to good): maps 75 down to 50
+    if (v <= good) {
+      return 75 - ((v - exc) / (good - exc)) * 25;
+    }
+
+    // Moderate tier (good to mod): maps 50 down to 25
+    if (v <= mod) {
+      return 50 - ((v - good) / (mod - good)) * 25;
+    }
+
+    // Poor tier (> mod): maps 25 down to 0
+    const poorSpan = (mod - good > 0) ? (mod - good) : exc;
+    return Math.max(0, 25 - ((v - mod) / poorSpan) * 25);
+  },
+
+  /**
    * Evaluates quality metrics and computes the composite score (0-100)
    * matching Christian Velasco's exact QA Scorecard algorithm
    */
@@ -21,62 +68,83 @@ export const SectionScorecard = {
     const totalDefects = counts.total || 0;
     const reopened = Number(params.reopened) || 0;
     const closed = (Number(params.closed) || 0) + reopened;
+    const escaped = params.escaped || { s1: 0, s2: 0, s3: 0, s4: 0, s5: 0 };
+    const totalEscaped = (escaped.s1 || 0) + (escaped.s2 || 0) + (escaped.s3 || 0) + (escaped.s4 || 0) + (escaped.s5 || 0);
 
-    const dd = totalDefects / sp;
-    const rr = closed > 0 ? (reopened / closed) : 0;
-    const s1r = (counts.s1 || 0) / sp;
-    const avgRt = counts.overallAvgRes !== undefined ? counts.overallAvgRes : (params.avgRes || 0);
+    // 1. Raw Values
+    const rawDensity = totalDefects / sp;
+    const rawEscape = (totalDefects + totalEscaped) > 0 ? (totalEscaped / (totalDefects + totalEscaped)) : 0;
+    const rawReopen = closed > 0 ? (reopened / closed) : 0;
+    const rawS1Rate = (counts.s1 || 0) / sp;
+    const rawAvgRes = counts.overallAvgRes !== undefined ? counts.overallAvgRes : (params.avgRes || 0);
 
-    // SLA Targets in days for Dev-to-QA turnaround
-    const slaTargets = { s1: 1.0, s2: 2.0, s3: 3.0, s4: 5.0, s5: 7.0 };
-    const weights = { s1: 0.30, s2: 0.25, s3: 0.17, s4: 0.15, s5: 0.13 };
+    // 2. Primary Metric Scores (0-100)
+    const scoreDensity = this.scoreTier(rawDensity, [0.005, 0.01, 0.03]);
+    const scoreEscape = this.scoreTier(rawEscape, [0.01, 0.03, 0.05]);
+    const scoreReopen = this.scoreTier(rawReopen, [0.03, 0.07, 0.15]);
+    const scoreS1Rate = this.scoreTier(rawS1Rate, [0, 0, 0]);
+    const scoreAvgRes = this.scoreTier(rawAvgRes, [1, 4, 7]);
 
-    // Calculate pillar scores (0 - 100)
-    const pillars = {};
-    for (let i = 1; i <= 5; i++) {
-      const key = `s${i}`;
-      const cnt = counts[key] || 0;
-      const res = (counts.avgResBySev && counts.avgResBySev[key]) || 0;
-      const target = slaTargets[key];
+    // Primary Group Score (% Weights: Density 25%, Escape 0%, Reopen 25%, S1 20%, Resolution 30%)
+    const primaryScore = (scoreDensity * 0.25) +
+                         (scoreEscape * 0.00) +
+                         (scoreReopen * 0.25) +
+                         (scoreS1Rate * 0.20) +
+                         (scoreAvgRes * 0.30);
 
-      if (cnt === 0) {
-        pillars[key] = 100;
-      } else {
-        pillars[key] = res <= target ? 100 : 0;
-      }
-    }
+    // 3. Severity Rows (defects/SP mapped against severity tier thresholds)
+    const s1Density = (counts.s1 || 0) / sp;
+    const s2Density = (counts.s2 || 0) / sp;
+    const s3Density = (counts.s3 || 0) / sp;
+    const s4Density = (counts.s4 || 0) / sp;
+    const s5Density = (counts.s5 || 0) / sp;
 
-    let score = 0;
-    for (let i = 1; i <= 5; i++) {
-      const key = `s${i}`;
-      score += (pillars[key] * weights[key]);
-    }
+    const scoreS1 = this.scoreTier(s1Density, [0, 0, 0]);
+    const scoreS2 = this.scoreTier(s2Density, [0, 0.02, 0.05]);
+    const scoreS3 = this.scoreTier(s3Density, [0.03, 0.05, 0.07]);
+    const scoreS4 = this.scoreTier(s4Density, [0.07, 0.10, 0.25]);
+    const scoreS5 = this.scoreTier(s5Density, [0.20, 0.50, 1.00]);
 
-    if (rr > 0.1) score -= (rr * 20);
-    score = Math.max(0, Math.min(100, Math.round(score)));
+    // Severity Group Score (Relative Weights: S1=10, S2=7, S3=4, S4=2, S5=1 -> Total 24 pts)
+    const sevGroupScore = ((scoreS1 * 10) + (scoreS2 * 7) + (scoreS3 * 4) + (scoreS4 * 2) + (scoreS5 * 1)) / 24;
 
+    // 4. Final Composite Score = (Primary × 50%) + (Severity Group × 50%)
+    let finalScore = (primaryScore * 0.50) + (sevGroupScore * 0.50);
+    finalScore = Math.max(0, Math.min(100, Math.round(finalScore)));
+
+    // 5. Quality Grade & Ring Color (Poor <30, Moderate 30-59, Good 60-89, Excellent 90-100)
     let grade = 'Excellent';
     let ringColor = '#3B6D11'; // Seagull green
-    if (score < 40) {
+    if (finalScore < 30) {
       grade = 'Poor';
       ringColor = '#A32D2D'; // Red
-    } else if (score < 70) {
+    } else if (finalScore < 60) {
       grade = 'Moderate';
-      ringColor = '#185FA5'; // Blue/Cyan
-    } else if (score < 90) {
+      ringColor = '#b45309'; // Amber/Orange
+    } else if (finalScore < 90) {
       grade = 'Good';
       ringColor = '#185FA5'; // Blue
     }
 
+    const pillars = {
+      s1: Math.round(scoreS1),
+      s2: Math.round(scoreS2),
+      s3: Math.round(scoreS3),
+      s4: Math.round(scoreS4),
+      s5: Math.round(scoreS5)
+    };
+
     return {
-      score,
+      score: finalScore,
       grade,
       ringColor,
-      density: dd.toFixed(2),
-      reopen: (rr * 100).toFixed(1),
-      s1Rate: (s1r * 100).toFixed(2),
-      avgRes: `${avgRt.toFixed(1)}d`,
-      pillars
+      density: rawDensity.toFixed(2),
+      reopen: (rawReopen * 100).toFixed(1),
+      s1Rate: (rawS1Rate * 100).toFixed(2),
+      avgRes: `${rawAvgRes.toFixed(1)}d`,
+      pillars,
+      primaryScore: Math.round(primaryScore),
+      sevGroupScore: Math.round(sevGroupScore)
     };
   },
 
@@ -173,6 +241,37 @@ export const SectionScorecard = {
     ctx.fillStyle = '#111827';
     ctx.font = 'bold 12px Arial, sans-serif';
     ctx.fillText(`${metrics.avgRes}`, 180, 105);
+
+    // Draw 5 Severity Mini-Pillars (Top Right)
+    const pillars = metrics.pillars || { s1: 100, s2: 100, s3: 100, s4: 100, s5: 100 };
+    const barBaseX = 405;
+    const barBaseY = 100;
+    const barMaxH = 26;
+    const barW = 8;
+    const barGap = 8;
+
+    ['s1', 's2', 's3', 's4', 's5'].forEach((k, i) => {
+      const bx = barBaseX + (i * (barW + barGap));
+      const pVal = pillars[k] !== undefined ? pillars[k] : 100;
+      const bH = Math.max(2, (pVal / 100) * barMaxH);
+      const by = barBaseY - bH;
+
+      // Color based on pillar score
+      ctx.fillStyle = pVal >= 90 ? '#3B6D11' : (pVal >= 60 ? '#185FA5' : (pVal >= 30 ? '#b45309' : '#A32D2D'));
+      ctx.beginPath();
+      ctx.roundRect(bx, by, barW, bH, 2);
+      ctx.fill();
+
+      // Score above bar
+      ctx.font = 'bold 8px Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(String(pVal), bx + (barW / 2), by - 3);
+
+      // Label below bar (S1..S5)
+      ctx.fillStyle = '#6b7280';
+      ctx.font = '8px Arial, sans-serif';
+      ctx.fillText(`S${i + 1}`, bx + (barW / 2), barBaseY + 11);
+    });
 
     return canvas.toDataURL('image/png');
   },

@@ -1,12 +1,12 @@
-import { SectionIntro } from './section-intro.js?v=16';
-import { SectionSummary } from './section-summary.js?v=16';
-import { SectionScorecard } from './section-scorecard.js?v=16';
-import { SectionBugsChart } from './section-bugs-chart.js?v=16';
-import { SectionBugsList } from './section-bugs-list.js?v=16';
-import { SectionLinks } from './section-links.js?v=16';
-import { TemplateMso } from './template-mso.js?v=16';
-import { ClipboardHelper } from './clipboard.js?v=16';
-import { JiraImporter } from './jira-importer.js?v=16';
+import { SectionIntro } from './section-intro.js?v=18';
+import { SectionSummary } from './section-summary.js?v=18';
+import { SectionScorecard } from './section-scorecard.js?v=18';
+import { SectionBugsChart } from './section-bugs-chart.js?v=18';
+import { SectionBugsList } from './section-bugs-list.js?v=18';
+import { SectionLinks } from './section-links.js?v=18';
+import { TemplateMso } from './template-mso.js?v=18';
+import { ClipboardHelper } from './clipboard.js?v=18';
+import { JiraImporter } from './jira-importer.js?v=18';
 
 const STORAGE_KEY = 'seagull_dispatcher_v1';
 
@@ -977,10 +977,17 @@ window.confirmJiraImport = function() {
 // Render Live Stats Header & Scorecard preview badge
 function renderLiveStats() {
   const counts = SectionBugsList.getSeverityCounts(state.bugs, state.referenceDate || new Date());
+  let reopenedCount = state.scorecardParams?.reopened || 0;
+  let closedCount = state.scorecardParams?.closed || 0;
+  (state.bugs || []).forEach(b => {
+    if (b.reopened) reopenedCount += Number(b.reopened) || 0;
+    if (b.status === 'Closed' || b.status === 'Resolved') closedCount++;
+  });
+
   const scoreMetrics = SectionScorecard.computeQualityScore({
-    storyPoints: state.scorecardParams.storyPoints || 22,
-    reopened: 0,
-    closed: 0,
+    storyPoints: state.scorecardParams?.storyPoints || 22,
+    reopened: reopenedCount,
+    closed: closedCount,
     severityCounts: counts
   });
 

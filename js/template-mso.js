@@ -1,9 +1,9 @@
-import { SectionIntro } from './section-intro.js?v=16';
-import { SectionSummary } from './section-summary.js?v=16';
-import { SectionScorecard } from './section-scorecard.js?v=16';
-import { SectionBugsChart } from './section-bugs-chart.js?v=16';
-import { SectionBugsList } from './section-bugs-list.js?v=16';
-import { SectionLinks } from './section-links.js?v=16';
+import { SectionIntro } from './section-intro.js?v=18';
+import { SectionSummary } from './section-summary.js?v=18';
+import { SectionScorecard } from './section-scorecard.js?v=18';
+import { SectionBugsChart } from './section-bugs-chart.js?v=18';
+import { SectionBugsList } from './section-bugs-list.js?v=18';
+import { SectionLinks } from './section-links.js?v=18';
 
 /**
  * Master Template Assembler
@@ -19,10 +19,17 @@ export const TemplateMso = {
 
     // 2. Generate Chart & Scorecard Images (offscreen Canvas)
     const chartBase64 = SectionBugsChart.generateChartImage(severityCounts);
+    let reopenedCount = state.scorecardParams?.reopened || 0;
+    let closedCount = state.scorecardParams?.closed || 0;
+    (state.bugs || []).forEach(b => {
+      if (b.reopened) reopenedCount += Number(b.reopened) || 0;
+      if (b.status === 'Closed' || b.status === 'Resolved') closedCount++;
+    });
+
     const scoreMetrics = SectionScorecard.computeQualityScore({
       storyPoints: state.scorecardParams?.storyPoints || 22,
-      reopened: state.scorecardParams?.reopened || 0,
-      closed: state.scorecardParams?.closed || 0,
+      reopened: reopenedCount,
+      closed: closedCount,
       severityCounts
     });
     const scorecardBase64 = SectionScorecard.generateScorecardImage(scoreMetrics);
