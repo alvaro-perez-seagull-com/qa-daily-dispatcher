@@ -18,12 +18,13 @@ export const SectionBugsList = {
 
   /**
    * Returns Age in days: uses b.age if explicitly provided (e.g. from Jira),
-   * otherwise auto-calculates: (Reference Date - Date Created).
+   * otherwise auto-calculates: (Reference Date - Date Created). Supports decimal values (e.g. 0.8).
    */
   getBugAge(bug, referenceDate = new Date()) {
     if (!bug) return 0;
     if (bug.age !== undefined && bug.age !== null && bug.age !== '') {
-      const parsed = parseInt(String(bug.age).replace(/[^\d]/g, ''), 10);
+      const cleanStr = String(bug.age).trim().replace(/[^0-9.]/g, '');
+      const parsed = parseFloat(cleanStr);
       if (!isNaN(parsed)) return parsed;
     }
     return this.calculateAge(bug.dateCreated, referenceDate);
@@ -148,7 +149,7 @@ export const SectionBugsList = {
     }
 
     return `
-<h2><span style='mso-fareast-font-family:"Times New Roman"'>List of Bugs Found<o:p></o:p></span></h2>
+<h2 style='mso-style-name:"Heading 2";margin-top:12.0pt;margin-right:0in;margin-bottom:6.0pt;margin-left:0in;font-size:15.0pt;font-family:"Segoe UI",Arial,sans-serif;color:#0F4761;font-weight:bold'><span style='font-size:15.0pt;font-family:"Segoe UI",Arial,sans-serif;color:#0F4761;font-weight:bold;mso-fareast-font-family:"Times New Roman"'>List of Bugs Found<o:p></o:p></span></h2>
 <p class=MsoNormal><o:p>&nbsp;</o:p></p>
 
 <table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width=1110

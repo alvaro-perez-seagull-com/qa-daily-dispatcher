@@ -182,7 +182,7 @@ export const SectionScorecard = {
    */
   renderMsoHtml(scorecardBase64) {
     return `
-<h2><span style='mso-fareast-font-family:"Times New Roman"'>Quality Scorecard<o:p></o:p></span></h2>
+<h2 style='mso-style-name:"Heading 2";margin-top:12.0pt;margin-right:0in;margin-bottom:6.0pt;margin-left:0in;font-size:15.0pt;font-family:"Segoe UI",Arial,sans-serif;color:#0F4761;font-weight:bold'><span style='font-size:15.0pt;font-family:"Segoe UI",Arial,sans-serif;color:#0F4761;font-weight:bold;mso-fareast-font-family:"Times New Roman"'>Quality Scorecard<o:p></o:p></span></h2>
 <p class=MsoNormal><o:p>&nbsp;</o:p></p>
 <p class=MsoNormal><img width=506 height=135 src="${scorecardBase64}" style='height:1.406in;width:5.27in'></p>
 <p class=MsoNormal><o:p>&nbsp;</o:p></p>

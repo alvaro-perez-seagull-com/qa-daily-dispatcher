@@ -260,11 +260,11 @@ export const JiraImporter = {
           return;
         }
 
-        // Age / Numeric float or int
+        // Age / Numeric float or int (e.g. 0.8, 1.5, 4)
         if (/^\d+(\.\d+)?\s*(d(ays)?)?$/i.test(tok)) {
           const num = parseFloat(tok);
           if (!isNaN(num)) {
-            age = Math.max(0, Math.ceil(num));
+            age = Math.max(0, num);
           }
           return;
         }
@@ -594,13 +594,13 @@ export const JiraImporter = {
       if (!isNaN(parsedReopen)) reopened = parsedReopen;
     }
 
-    // Age
+    // Age (supports decimal values like 0.8)
     let age = null;
     if (mapping.age !== -1 && cells[mapping.age] !== undefined && cells[mapping.age] !== '') {
       const rawAgeStr = String(cells[mapping.age]).replace(/[^\d.]/g, '');
       const parsedAge = parseFloat(rawAgeStr);
       if (!isNaN(parsedAge)) {
-        age = Math.max(0, Math.ceil(parsedAge));
+        age = Math.max(0, parsedAge);
       }
     }
 

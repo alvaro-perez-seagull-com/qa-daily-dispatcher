@@ -1,12 +1,12 @@
-import { SectionIntro } from './section-intro.js?v=14';
-import { SectionSummary } from './section-summary.js?v=14';
-import { SectionScorecard } from './section-scorecard.js?v=14';
-import { SectionBugsChart } from './section-bugs-chart.js?v=14';
-import { SectionBugsList } from './section-bugs-list.js?v=14';
-import { SectionLinks } from './section-links.js?v=14';
-import { TemplateMso } from './template-mso.js?v=14';
-import { ClipboardHelper } from './clipboard.js?v=14';
-import { JiraImporter } from './jira-importer.js?v=14';
+import { SectionIntro } from './section-intro.js?v=15';
+import { SectionSummary } from './section-summary.js?v=15';
+import { SectionScorecard } from './section-scorecard.js?v=15';
+import { SectionBugsChart } from './section-bugs-chart.js?v=15';
+import { SectionBugsList } from './section-bugs-list.js?v=15';
+import { SectionLinks } from './section-links.js?v=15';
+import { TemplateMso } from './template-mso.js?v=15';
+import { ClipboardHelper } from './clipboard.js?v=15';
+import { JiraImporter } from './jira-importer.js?v=15';
 
 const STORAGE_KEY = 'seagull_dispatcher_v1';
 
@@ -796,7 +796,7 @@ function renderBugsTable() {
           </select>
         </td>
         <td><input type="number" class="form-control" style="text-align:right" value="${b.reopened || 0}" onchange="updateBug(${idx}, 'reopened', this.value, this)"></td>
-        <td class="age-cell" style="text-align:right"><input type="text" inputmode="numeric" class="form-control" style="text-align:right" value="${age}" onchange="updateBug(${idx}, 'age', this.value, this)" title="Age in days (from Jira or calculated from Date Created)"></td>
+        <td class="age-cell" style="text-align:right"><input type="text" inputmode="decimal" class="form-control" style="text-align:right" value="${age}" onchange="updateBug(${idx}, 'age', this.value, this)" title="Age in days (e.g. 0.8 or 14)"></td>
         <td style="text-align:center"><button class="btn-icon danger" tabindex="-1" title="Delete Bug" onclick="removeBugRow(${idx})">&times;</button></td>
       `;
       tbody.appendChild(tr);
@@ -808,7 +808,8 @@ function renderBugsTable() {
 
 window.updateBug = function(index, field, value, el) {
   if (field === 'age') {
-    const parsed = parseInt(String(value).replace(/[^\d]/g, ''), 10);
+    const cleanStr = String(value).trim().replace(/[^0-9.]/g, '');
+    const parsed = parseFloat(cleanStr);
     state.bugs[index].age = !isNaN(parsed) ? parsed : 0;
     if (el) el.value = state.bugs[index].age;
   } else {

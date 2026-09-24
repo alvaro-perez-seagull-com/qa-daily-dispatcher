@@ -1,9 +1,9 @@
-import { SectionIntro } from './section-intro.js?v=14';
-import { SectionSummary } from './section-summary.js?v=14';
-import { SectionScorecard } from './section-scorecard.js?v=14';
-import { SectionBugsChart } from './section-bugs-chart.js?v=14';
-import { SectionBugsList } from './section-bugs-list.js?v=14';
-import { SectionLinks } from './section-links.js?v=14';
+import { SectionIntro } from './section-intro.js?v=15';
+import { SectionSummary } from './section-summary.js?v=15';
+import { SectionScorecard } from './section-scorecard.js?v=15';
+import { SectionBugsChart } from './section-bugs-chart.js?v=15';
+import { SectionBugsList } from './section-bugs-list.js?v=15';
+import { SectionLinks } from './section-links.js?v=15';
 
 /**
  * Master Template Assembler

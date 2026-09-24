@@ -17,14 +17,51 @@ export const SectionIntro = {
   },
 
   /**
+   * Sanitizes feature initiative name by removing redundant version prefixes or Jira keys
+   * e.g. "BTC v12.6 [IDEA-3110] Intelligent Forms" -> "Intelligent Forms"
+   */
+  cleanFeatureName(rawName, productVersion = '', ideaKey = '', epicKey = '') {
+    if (!rawName) return '';
+    let name = rawName.trim();
+
+    // Strip leading product version if repeated (e.g. "BTC v12.6:" or "BTC v12.6")
+    if (productVersion) {
+      const escapedVer = productVersion.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      name = name.replace(new RegExp(`^${escapedVer}[:\\s-]*`, 'i'), '');
+    }
+    // General version pattern strip (e.g. "BTC v12.6", "BTOP v12.1.1")
+    name = name.replace(/^(BTC|BTOP|BTO)\s*v?\d+(\.\d+)*[:\s-]*/i, '');
+
+    // Strip bracketed or raw keys matching idea or epic
+    if (ideaKey) {
+      const escIdea = ideaKey.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      name = name.replace(new RegExp(`^\\[?\\s*${escIdea}\\s*\\]?[:\\s-]*`, 'i'), '');
+    }
+    if (epicKey) {
+      const escEpic = epicKey.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      name = name.replace(new RegExp(`^\\[?\\s*${escEpic}\\s*\\]?[:\\s-]*`, 'i'), '');
+    }
+    // Strip any remaining leading bracketed key (e.g. "[IDEA-3110" or "[BPLAT-20767]")
+    name = name.replace(/^\[?[A-Z]{2,10}-\d+\]?[:\s-]*/i, '');
+
+    // Clean up any remaining leading separators
+    name = name.replace(/^[:\s-]+/, '').trim();
+    return name;
+  },
+
+  /**
    * Generates the subject line
-   * e.g.: BTC v12.6: [IDEA-3110] Intelligent Forms: Refreshable Print Preview - Daily Status - 2026-09-23
+   * e.g.: BTC v12.6: [IDEA-3110] Intelligent Forms: Refreshable Print Preview - Daily Status - 2026-09-24
    */
   generateSubject(data) {
     const today = new Date().toISOString().split('T')[0];
     const keys = [data.ideaKey, data.epicKey].filter(k => k && k.trim()).join(' / ');
     const prefix = keys ? `[${keys}] ` : '';
-    return `${data.productVersion}: ${prefix}${data.featureName} - Daily Status - ${today}`;
+    const cleanName = this.cleanFeatureName(data.featureName, data.productVersion, data.ideaKey, data.epicKey);
+    const finalFeature = cleanName || data.featureName || 'Test Feature';
+    const ver = (data.productVersion || '').trim();
+    const verPrefix = ver ? `${ver}: ` : '';
+    return `${verPrefix}${prefix}${finalFeature} - Daily Status - ${today}`;
   },
 
   /**
