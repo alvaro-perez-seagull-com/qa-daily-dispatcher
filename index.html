@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seagull QA Daily Dispatcher</title>
+  <link rel="stylesheet" href="css/styles.css?v=4">
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="brand-wrapper">
+        <div class="brand-logo">
+          <svg width="24" height="24" viewBox="0 0 100 100" fill="none">
+            <path d="M25 60C35 45 45 45 55 55C65 45 75 45 85 60" stroke="#2388FF" stroke-width="8" stroke-linecap="round"/>
+            <path d="M30 70C38 58 46 58 55 66C64 58 72 58 80 70" stroke="#00C0FF" stroke-width="7" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title">Seagull QA Daily Dispatcher</div>
+          <div class="brand-subtitle">Automated Outlook Daily Status Generator for BarTender Cloud & OnPrem</div>
+        </div>
+      </div>
+
+      <!-- Live Scorecard Preview Badge -->
+      <div id="live-scorecard-badge" class="live-badge-wrapper"></div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="tabs-nav">
+      <button class="tab-btn active" data-tab="setup" onclick="switchTab('setup')">1. Project Setup & Links</button>
+      <button class="tab-btn" data-tab="summary" onclick="switchTab('summary')">2. Test Cycles Summary</button>
+      <button class="tab-btn" data-tab="bugs" onclick="switchTab('bugs')">3. List of Bugs (Jira)</button>
+      <button class="tab-btn" data-tab="preview" onclick="switchTab('preview')">4. Live Email Preview</button>
+    </nav>
+
+    <!-- TAB 1: SETUP & LINKS -->
+    <section id="panel-setup" class="tab-panel active">
+      <div id="setup-validation-banner" class="validation-banner">
+        <span>⚠️</span>
+        <div>Please provide at least one key: <strong>IDEA Jira Key</strong> or <strong>Epic Jira Key</strong> (or both) before proceeding.</div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Project & Feature Identification</div>
+          </div>
+          <div class="form-group">
+            <label>Feature Initiative Name</label>
+            <input type="text" id="input-feature-name" class="form-control" placeholder="e.g. Intelligent Forms: Refreshable Print Preview">
+          </div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label>Product Version</label>
+              <input type="text" id="input-product-version" class="form-control" placeholder="e.g. BTC v12.6" oninput="handleProductVersionInput(this.value)">
+            </div>
+            <div class="form-group">
+              <label>Execution Start Date</label>
+              <input type="text" id="input-start-date" class="form-control" placeholder="MM/DD/YYYY" maxlength="10" oninput="handleDateInput(this)" onblur="handleDateBlur(this)">
+              <small id="start-date-error" style="color:var(--accent-red);font-size:11px;display:none;margin-top:4px">Please enter a valid full date in MM/DD/YYYY format</small>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label>IDEA Jira Key</label>
+              <input type="text" id="input-idea-key" class="form-control" placeholder="IDEA-3110" oninput="handleKeyInput('idea', this.value)">
+              <small style="color:var(--text-muted);font-size:11px;display:block;margin-top:4px">
+                Paste key or full Jira URL (auto-extracts)
+              </small>
+            </div>
+            <div class="form-group">
+              <label>Epic Jira Key</label>
+              <input type="text" id="input-epic-key" class="form-control" placeholder="BPLAT-20767" oninput="handleKeyInput('epic', this.value)">
+              <small style="color:var(--text-muted);font-size:11px;display:block;margin-top:4px">
+                Paste key or full Jira URL (auto-extracts)
+              </small>
+            </div>
+          </div>
+          <div class="form-group" style="margin-top:6px">
+            <label>JIRA - List of Bugs Filter URL</label>
+            <div class="input-action-group">
+              <input type="text" id="input-filter-url" class="form-control" readonly placeholder="Auto-generated based on Jira Key..." style="background:var(--bg-subtle);cursor:default">
+              <button type="button" class="btn btn-secondary" onclick="copyFilterUrl()" title="Copy Filter URL to Clipboard" style="white-space:nowrap;display:inline-flex;align-items:center;gap:6px">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                Copy URL
+              </button>
+            </div>
+            <small style="color:var(--text-muted);font-size:11px;display:block;margin-top:4px">
+              Auto-generated from IDEA key (or Epic key). Used in email Links section.
+            </small>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">QA Engineer & Scorecard Settings</div>
+          </div>
+          <div class="form-group">
+            <label>QA Engineer Name</label>
+            <input type="text" id="input-sender-name" class="form-control" placeholder="Alvaro Perez">
+          </div>
+          <div class="form-group">
+            <label>
+              Feature Story Points
+              <span class="tooltip-wrapper" tabindex="0">
+                <span class="tooltip-icon">i</span>
+                <span class="tooltip-box">
+                  Enter the total story points for the feature or scope being tested (e.g. 22 SP). The Quality Scorecard uses this number to calculate Defect Density (Defects / Story Points) rather than total test case count, preventing metric distortion.
+                </span>
+              </span>
+            </label>
+            <input type="number" id="input-sp" class="form-control" placeholder="3.5" min="0.1" step="any">
+          </div>
+          <div style="margin-top:20px;padding:14px;background:var(--bg-subtle);border-radius:8px;border:1px solid var(--border);font-size:12px;color:var(--text-muted);line-height:1.5">
+            <strong style="color:var(--primary);display:block;margin-bottom:4px">💡 Outlook Distribution:</strong>
+            Recipient lines (To: and Cc:) are configured directly in your Outlook compose window so you can select the appropriate distribution groups dynamically.
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Footer (Outside the cards) -->
+      <div class="setup-actions-footer">
+        <div style="display:flex;gap:10px;align-items:center">
+          <button type="button" class="btn btn-outline-danger" onclick="openResetModal()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            Reset Form
+          </button>
+          <button type="button" class="btn btn-secondary" onclick="triggerImportSession()" title="Import a previously exported JSON session file">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Import Session (.json)
+          </button>
+          <input type="file" id="session-file-input" accept=".json,application/json" style="display:none" onchange="handleSessionFileSelected(event)">
+        </div>
+        <button type="button" id="btn-continue-cycles" class="btn btn-primary" onclick="proceedToCycles()" disabled>
+          Continue to Cycles &rarr;
+        </button>
+      </div>
+    </section>
+
+    <!-- TAB 2: TEST CYCLES SUMMARY -->
+    <section id="panel-summary" class="tab-panel">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Test Cycles Summary Table</div>
+            <div style="font-size:12px;color:var(--text-muted)">Configure cycle progress. The Total summary row is automatically computed.</div>
+          </div>
+        </div>
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width:23%">Area</th>
+                <th style="width:11%">Product Version</th>
+                <th style="width:11%;text-align:center">Ready To Test</th>
+                <th style="width:12%">Testing Status</th>
+                <th style="width:8%;text-align:right">TC Progress %</th>
+                <th style="width:8%;text-align:right">TC Passed %</th>
+                <th style="width:7%;text-align:right"># ReTest</th>
+                <th style="width:7%;text-align:right"># Issues</th>
+                <th style="width:8%;text-align:right"># TestCases</th>
+                <th style="width:4%;text-align:center">Del</th>
+              </tr>
+            </thead>
+            <tbody id="cycles-tbody"></tbody>
+            <tfoot>
+              <tr class="quick-add-row">
+                <td colspan="10" style="padding:10px 14px;background:#f8fafc;border-top:1px dashed var(--border)">
+                  <button type="button" id="btn-quick-add-cycle" class="btn btn-secondary" onclick="addCycleRow()" title="Add New Test Cycle (Auto-focuses on new cycle)">+ Add Test Cycle</button>
+                </td>
+              </tr>
+              <tr id="cycles-totals-row" class="totals-row"></tr>
+            </tfoot>
+          </table>
+        </div>
+        <div style="margin-top:20px;display:flex;justify-content:space-between">
+          <button class="btn" onclick="switchTab('setup')">&larr; Back to Setup</button>
+          <button class="btn btn-primary" onclick="switchTab('bugs')">Continue to Bugs &rarr;</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: LIST OF BUGS (JIRA) -->
+    <section id="panel-bugs" class="tab-panel">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">List of Bugs Found (Jira)</div>
+            <div style="font-size:12px;color:var(--text-muted)">
+              Age is ingested directly from Jira (or auto-calculated from Date Created). Highlight and copy defect rows directly from Jira search.
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button type="button" class="btn btn-secondary" onclick="openJiraFilter()" title="Open the generated Jira filter URL in a new tab">
+              <span>Open Filter in Jira ↗</span>
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="openJiraPasteModal()" title="Import/paste rows copied from Jira">
+              <span>📋 Paste from Jira</span>
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="addBugRow()">+ Add Bug</button>
+          </div>
+        </div>
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width:8%">Type</th>
+                <th style="width:12%">ID / Key</th>
+                <th style="width:30%">Summary</th>
+                <th style="width:12%">Date Created</th>
+                <th style="width:14%">Severity</th>
+                <th style="width:8%">Status</th>
+                <th style="width:6%;text-align:right"># ReOpen</th>
+                <th style="width:6%;text-align:right">Age</th>
+                <th style="width:4%;text-align:center">Del</th>
+              </tr>
+            </thead>
+            <tbody id="bugs-tbody"></tbody>
+          </table>
+        </div>
+        <div style="margin-top:20px;display:flex;justify-content:space-between">
+          <button class="btn" onclick="switchTab('summary')">&larr; Back to Cycles</button>
+          <button class="btn btn-primary" onclick="switchTab('preview')">Generate Live Preview &rarr;</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: LIVE PREVIEW & EXPORT -->
+    <section id="panel-preview" class="tab-panel">
+      <!-- 1. Title plus message -->
+      <div class="preview-page-header">
+        <h3 style="font-size:16px;font-weight:700;color:var(--primary);margin:0 0 4px 0">Live Outlook Email Preview</h3>
+        <p style="font-size:13px;color:var(--text-muted);margin:0">
+          Inspect formatting below before copying. All Word 15 MSO styles, tables, and images are rendered live.
+        </p>
+      </div>
+
+      <!-- 2. Subject line in read-only field plus clipboard icon (no label) -->
+      <div class="preview-subject-card">
+        <label for="preview-subject-input" style="font-weight:700;font-size:12px;text-transform:uppercase;color:var(--text-muted);white-space:nowrap;margin:0;letter-spacing:0.5px">
+          Subject Line:
+        </label>
+        <input type="text" id="preview-subject-input" class="form-control readonly-field" readonly style="flex:1;background:var(--bg-subtle);font-size:13px;font-weight:600;color:#0F4761;cursor:default" title="Auto-generated Email Subject Line">
+        <button type="button" class="btn btn-secondary btn-icon" onclick="copySubjectLine()" title="Copy Subject Line to Clipboard" aria-label="Copy Subject Line" style="padding:7px 11px;display:inline-flex;align-items:center;justify-content:center">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- 3. Preview of formatted email with refresh preview button & copy icon in top toolbar -->
+      <div class="preview-frame-container">
+        <div class="preview-toolbar">
+          <span style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--text-muted);letter-spacing:0.5px">
+            Formatted Email Preview
+          </span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <button type="button" class="btn btn-secondary" onclick="refreshPreviewManually()" title="Refresh preview with latest data" style="display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:6px 12px">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+              </svg>
+              <span>Refresh Preview</span>
+            </button>
+            <button type="button" class="btn btn-secondary btn-icon" onclick="copyEmailToClipboard()" title="Copy Formatted Email to Clipboard" aria-label="Copy Formatted Email" style="padding:7px 11px;display:inline-flex;align-items:center;justify-content:center">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <iframe id="email-preview-frame" title="Email Live Preview"></iframe>
+      </div>
+
+      <!-- Bottom Actions: Export Session (Left) & Copy Formatted Email (Right) on the same line -->
+      <div class="preview-bottom-actions" style="display:flex;justify-content:space-between;align-items:center;width:100%;margin-top:16px">
+        <button type="button" class="btn btn-secondary" onclick="exportSessionJson()" title="Save all state and tables to a downloadable JSON file" style="display:inline-flex;align-items:center;gap:8px">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span>Export Session (.json)</span>
+        </button>
+        <button type="button" class="btn btn-primary" onclick="copyEmailToClipboard()" style="display:inline-flex;align-items:center;gap:8px">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          <span>Copy Formatted Email</span>
+        </button>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Reset Form Confirmation Modal -->
+  <div id="reset-confirm-modal" class="modal-backdrop" aria-hidden="true" role="dialog" aria-modal="true" onclick="if(event.target === this) closeResetModal()">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span style="font-size:18px">⚠️</span>
+          <span>Reset Form to Initial State?</span>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeResetModal()" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to reset all form fields? This will clear all entered project identification details, test cycles, and bug entries from your browser's local cache and start fresh.</p>
+        <p style="margin-top:12px;font-size:12px;color:var(--text-muted)">
+          <strong>Note:</strong> This action cannot be undone.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn" onclick="closeResetModal()">Cancel</button>
+        <button type="button" class="btn btn-danger" onclick="confirmResetForm()">Yes, Reset Form</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Jira Import Modal -->
+  <div id="jira-import-modal" class="modal-backdrop" aria-hidden="true" role="dialog" aria-modal="true" onclick="if(event.target === this) closeJiraPasteModal()">
+    <div class="modal-dialog" style="max-width:680px">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span style="font-size:18px">📋</span>
+          <span>Import Defects from Jira</span>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeJiraPasteModal()" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="jira-import-steps">
+          <div class="import-step">
+            <span class="step-num">1</span>
+            <span>Click <a href="javascript:void(0)" onclick="openJiraFilter()" style="color:var(--primary);font-weight:600">Open Filter in Jira ↗</a> to view your defects search table.</span>
+          </div>
+          <div class="import-step">
+            <span class="step-num">2</span>
+            <span>Highlight the defect rows with your mouse and press <kbd>Cmd+C</kbd> / <kbd>Ctrl+C</kbd>.</span>
+          </div>
+          <div class="import-step">
+            <span class="step-num">3</span>
+            <span>Paste below (or click <strong>Read Clipboard</strong>). Pure clipboard copy — no files or Excel required!</span>
+          </div>
+        </div>
+
+        <div style="margin-top:14px">
+          <textarea id="jira-paste-input" class="form-control" style="height:130px;font-family:monospace;font-size:12px;resize:vertical" placeholder="Paste copied Jira table rows here (Tab-separated rows, XML, or JSON)..." oninput="previewPastedJiraData()"></textarea>
+        </div>
+
+        <div id="jira-paste-preview-container" style="display:none;margin-top:14px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <strong id="jira-paste-preview-count" style="font-size:12.5px;color:var(--text-main)">0 defects detected</strong>
+            <span style="font-size:11.5px;color:var(--text-muted)">Auto-detected columns & Age</span>
+          </div>
+          <div class="data-table-wrapper" style="max-height:160px;overflow-y:auto">
+            <table class="data-table" style="font-size:11.5px">
+              <thead>
+                <tr>
+                  <th style="width:10%">Type</th>
+                  <th style="width:18%">Key</th>
+                  <th style="width:38%">Summary</th>
+                  <th style="width:18%">Severity</th>
+                  <th style="width:10%">Status</th>
+                  <th style="width:6%;text-align:right">Age</th>
+                </tr>
+              </thead>
+              <tbody id="jira-paste-preview-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div style="margin-top:16px;display:flex;align-items:center;gap:18px">
+          <label style="display:flex;align-items:center;gap:6px;font-size:12.5px;cursor:pointer">
+            <input type="radio" name="jira-import-mode" value="replace" checked>
+            <span>Replace existing bugs</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:12.5px;cursor:pointer">
+            <input type="radio" name="jira-import-mode" value="append">
+            <span>Append to existing bugs</span>
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn" onclick="closeJiraPasteModal()">Cancel</button>
+        <button type="button" class="btn btn-secondary" onclick="readFromClipboardDirectly()">📋 Read Clipboard</button>
+        <button type="button" class="btn btn-primary" id="btn-confirm-jira-import" onclick="confirmJiraImport()" disabled>Import Defects</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast"></div>
+
+  <!-- ES Module Application Entrypoint -->
+  <script type="module" src="js/app.js?v=14"></script>
+</body>
+</html>
