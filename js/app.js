@@ -1252,7 +1252,7 @@ function renderLiveStats() {
 
   const badgeEl = document.getElementById('live-scorecard-badge');
   if (badgeEl) {
-    const isZero = counts.total === 0;
+    const isPlaceholder = scoreMetrics.density === '—';
     const tooltip = scoreMetrics.errorMessage ? ` title="${escapeHtml(scoreMetrics.errorMessage)}"` : '';
     badgeEl.innerHTML = `
       <div class="score-circle" style="border-color:${scoreMetrics.ringColor}"${tooltip}>
@@ -1262,9 +1262,9 @@ function renderLiveStats() {
       <div${tooltip}>
         <div style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase">Live Score Preview</div>
         <div style="font-size:12px;color:#374151;margin-top:2px">
-          Density: <strong>${scoreMetrics.density}${isZero ? '' : '/SP'}</strong> &bull; 
-          Reopen: <strong>${scoreMetrics.reopen}${isZero ? '' : '%'}</strong> &bull; 
-          S1 rate: <strong>${scoreMetrics.s1Rate}${isZero ? '' : '%'}</strong> &bull; 
+          Density: <strong>${scoreMetrics.density}${isPlaceholder ? '' : '/SP'}</strong> &bull; 
+          Reopen: <strong>${scoreMetrics.reopen}${isPlaceholder ? '' : '%'}</strong> &bull; 
+          S1 rate: <strong>${scoreMetrics.s1Rate}${isPlaceholder ? '' : '%'}</strong> &bull; 
           Avg res: <strong>${scoreMetrics.avgRes}</strong> &bull;
           Bugs: <strong>${counts.total}</strong>
         </div>

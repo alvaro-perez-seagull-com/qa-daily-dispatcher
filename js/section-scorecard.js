@@ -102,23 +102,6 @@ export const SectionScorecard = {
     const escaped = params.escaped || { s1: 0, s2: 0, s3: 0, s4: 0, s5: 0 };
     const totalEscaped = (escaped.s1 || 0) + (escaped.s2 || 0) + (escaped.s3 || 0) + (escaped.s4 || 0) + (escaped.s5 || 0);
 
-    // Empty state: when no defects exist yet, show clean placeholders matching QA Scorecard default
-    if (totalDefects === 0) {
-      return {
-        score: '—',
-        grade: '—',
-        ringColor: '#185FA5',
-        density: '—',
-        reopen: '—',
-        s1Rate: '—',
-        avgRes: '—',
-        pillars: { s1: 100, s2: 100, s3: 100, s4: 100, s5: 100 },
-        primaryScore: null,
-        sevGroupScore: null,
-        hasData: false
-      };
-    }
-
     // 1. Raw Values with Finite Validation
     const rawDensity = totalDefects / sp;
     const rawEscape = (totalDefects + totalEscaped) > 0 ? (totalEscaped / (totalDefects + totalEscaped)) : 0;
@@ -143,8 +126,8 @@ export const SectionScorecard = {
     const scoreEscape = this.scoreTier(rawEscape, [0.01, 0.03, 0.05]);
     const scoreReopen = this.scoreTier(rawReopen, [0.03, 0.07, 0.15]);
     const scoreS1Rate = this.scoreTier(rawS1Rate, [0, 0, 0]);
-    // If no valid turnaround days exist, scoreAvgRes evaluates to 0 (does not inflate score)
-    const scoreAvgRes = rawAvgRes !== null ? this.scoreTier(rawAvgRes, [1, 4, 7]) : 0;
+    // If no defects exist, turnaround SLA target is 100% met; otherwise if no valid turnaround days exist, scoreAvgRes evaluates to 0 (does not inflate score)
+    const scoreAvgRes = (totalDefects === 0) ? 100 : (rawAvgRes !== null ? this.scoreTier(rawAvgRes, [1, 4, 7]) : 0);
 
     // Primary Group Score (% Weights: Density 25%, Escape 0%, Reopen 25%, S1 20%, Resolution 30%)
     const primaryScore = (scoreDensity * 0.25) +
