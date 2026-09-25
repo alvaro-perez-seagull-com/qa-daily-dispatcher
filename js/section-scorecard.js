@@ -229,7 +229,11 @@ export const SectionScorecard = {
     ctx.strokeStyle = '#2d2f36';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.roundRect(6, 6, width - 12, height - 12, 8);
+    if (typeof ctx.roundRect === 'function') {
+      ctx.roundRect(6, 6, width - 12, height - 12, 8);
+    } else {
+      ctx.rect(6, 6, width - 12, height - 12);
+    }
     ctx.fill();
     ctx.stroke();
 
