@@ -75,11 +75,12 @@ export const SectionBugsList = {
     bugs.forEach(b => {
       const sevNum = this.extractSeverityNumber(b.severity);
       const age = this.getBugAge(b, referenceDate);
+      const safeAge = (typeof age === 'number' && Number.isFinite(age) && age >= 0) ? age : 0;
       if (sevNum >= 1 && sevNum <= 5) {
         counts[`s${sevNum}`]++;
-        counts[`s${sevNum}Age`] += age;
+        counts[`s${sevNum}Age`] += safeAge;
         counts.total++;
-        counts.totalAge += age;
+        counts.totalAge += safeAge;
       }
     });
 

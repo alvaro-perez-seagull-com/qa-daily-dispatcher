@@ -27,7 +27,7 @@ export const TemplateMso = {
     });
 
     const scoreMetrics = SectionScorecard.computeQualityScore({
-      storyPoints: state.scorecardParams?.storyPoints || 22,
+      storyPoints: state.scorecardParams?.storyPoints,
       reopened: reopenedCount,
       closed: closedCount,
       severityCounts
@@ -37,7 +37,7 @@ export const TemplateMso = {
     // 3. Render HTML blocks from each module
     const introHtml = SectionIntro.renderMsoHtml(state.introData);
     const summaryHtml = SectionSummary.renderMsoHtml(state.cycles);
-    const scorecardHtml = SectionScorecard.renderMsoHtml(scorecardBase64);
+    const scorecardHtml = SectionScorecard.renderMsoHtml(scorecardBase64, scoreMetrics);
     const chartHtml = SectionBugsChart.renderMsoHtml(chartBase64);
     const bugsListHtml = SectionBugsList.renderMsoHtml(state.bugs, state.referenceDate || new Date());
     const linksHtml = SectionLinks.renderMsoHtml(state.links);

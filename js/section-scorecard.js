@@ -5,7 +5,7 @@
  */
 export const SectionScorecard = {
   defaultConfig: {
-    storyPoints: 22, // Feature scope denominator
+    storyPoints: null, // Manually configured feature scope denominator
     reopened: 0,
     closed: 0,
     escaped: { s1: 0, s2: 0, s3: 0, s4: 0, s5: 0 }
@@ -15,6 +15,11 @@ export const SectionScorecard = {
    * Linear tier interpolation (Excellent 100-75, Good 75-50, Moderate 50-25, Poor 25-0)
    * Matching Christian Velasco's exact QA Scorecard engine
    */
+  // NOTE: scoreTier() assumes callers have already validated their
+  // input (finite, non-null numbers). computeQualityScore() enforces
+  // this upstream for all current callers. If scoreTier() is ever
+  // called from a new location, validate there first — do not
+  // reintroduce silent fallback behavior inside this function.
   scoreTier(val, thresholds) {
     const v = Math.max(0, Number(val) || 0);
     const [exc, good, mod] = thresholds;
@@ -63,7 +68,33 @@ export const SectionScorecard = {
    * matching Christian Velasco's exact QA Scorecard algorithm
    */
   computeQualityScore(params) {
-    const sp = Math.max(0.1, Number(params.storyPoints) || 22);
+    // 0. Story Points Validation & Separation of Concerns:
+    // Concern A (Input Validation): Reject missing, zero, blank, or non-finite values without guessing.
+    // Concern B (Arithmetic Floor): Math.max(0.1, sp) safeguards against divide-by-zero for valid positive numbers.
+    const rawSp = params ? params.storyPoints : undefined;
+    const numSp = Number(rawSp);
+    const hasValidSp = rawSp !== null && rawSp !== undefined && rawSp !== '' && Number.isFinite(numSp) && numSp > 0;
+
+    if (!hasValidSp) {
+      return {
+        score: '—',
+        grade: '—',
+        ringColor: '#b45309', // Amber warning ring
+        density: '—',
+        reopen: '—',
+        s1Rate: '—',
+        avgRes: '—',
+        pillars: null,
+        primaryScore: null,
+        sevGroupScore: null,
+        hasData: false,
+        invalidInput: true,
+        missingStoryPoints: true,
+        errorMessage: 'Feature Story Points (SP) is missing or invalid. Please enter a positive number in Setup.'
+      };
+    }
+
+    const sp = Math.max(0.1, numSp);
     const counts = params.severityCounts || { s1: 0, s2: 0, s3: 0, s4: 0, s5: 0, total: 0, avgResBySev: {}, overallAvgRes: 0 };
     const totalDefects = counts.total || 0;
     const reopened = Number(params.reopened) || 0;
@@ -88,19 +119,25 @@ export const SectionScorecard = {
       };
     }
 
-    // 1. Raw Values
+    // 1. Raw Values with Finite Validation
     const rawDensity = totalDefects / sp;
     const rawEscape = (totalDefects + totalEscaped) > 0 ? (totalEscaped / (totalDefects + totalEscaped)) : 0;
     const rawReopen = closed > 0 ? (reopened / closed) : 0;
     const rawS1Rate = (counts.s1 || 0) / sp;
-    const rawAvgRes = counts.overallAvgRes !== undefined ? counts.overallAvgRes : (params.avgRes || 0);
+
+    // Validate that candidate turnaround is a finite, non-negative number
+    const candidateAvgRes = counts.overallAvgRes !== undefined ? counts.overallAvgRes : params.avgRes;
+    const numAvgRes = Number(candidateAvgRes);
+    const hasValidAvgRes = candidateAvgRes !== null && candidateAvgRes !== undefined && candidateAvgRes !== '' && Number.isFinite(numAvgRes) && numAvgRes >= 0;
+    const rawAvgRes = hasValidAvgRes ? numAvgRes : null;
 
     // 2. Primary Metric Scores (0-100)
     const scoreDensity = this.scoreTier(rawDensity, [0.005, 0.01, 0.03]);
     const scoreEscape = this.scoreTier(rawEscape, [0.01, 0.03, 0.05]);
     const scoreReopen = this.scoreTier(rawReopen, [0.03, 0.07, 0.15]);
     const scoreS1Rate = this.scoreTier(rawS1Rate, [0, 0, 0]);
-    const scoreAvgRes = this.scoreTier(rawAvgRes, [1, 4, 7]);
+    // If no valid turnaround days exist, scoreAvgRes evaluates to 0 (does not inflate score)
+    const scoreAvgRes = rawAvgRes !== null ? this.scoreTier(rawAvgRes, [1, 4, 7]) : 0;
 
     // Primary Group Score (% Weights: Density 25%, Escape 0%, Reopen 25%, S1 20%, Resolution 30%)
     const primaryScore = (scoreDensity * 0.25) +
@@ -155,10 +192,10 @@ export const SectionScorecard = {
       score: finalScore,
       grade,
       ringColor,
-      density: rawDensity.toFixed(2),
-      reopen: (rawReopen * 100).toFixed(1),
-      s1Rate: (rawS1Rate * 100).toFixed(2),
-      avgRes: `${rawAvgRes.toFixed(1)}d`,
+      density: Number.isFinite(rawDensity) ? rawDensity.toFixed(2) : '—',
+      reopen: Number.isFinite(rawReopen) ? (rawReopen * 100).toFixed(1) : '—',
+      s1Rate: Number.isFinite(rawS1Rate) ? (rawS1Rate * 100).toFixed(2) : '—',
+      avgRes: rawAvgRes !== null ? `${rawAvgRes.toFixed(1)}d` : '—',
       pillars,
       primaryScore: Math.round(primaryScore),
       sevGroupScore: Math.round(sevGroupScore),
@@ -208,6 +245,8 @@ export const SectionScorecard = {
       if (numScore < 30) ringColor = '#ef4444'; // Red (Poor)
       else if (numScore < 60) ringColor = '#f59e0b'; // Amber (Moderate)
       else ringColor = '#22c55e'; // Green (Good & Excellent)
+    } else if (metrics && (metrics.invalidInput || metrics.missingStoryPoints)) {
+      ringColor = '#f59e0b'; // Amber accent for invalid / missing SP input state
     } else {
       ringColor = '#3b82f6'; // Blue accent for empty state
     }
@@ -237,9 +276,15 @@ export const SectionScorecard = {
       ctx.font = 'bold 20px Arial, sans-serif';
       ctx.fillText('—', ringCenterX, ringCenterY - 5);
 
-      ctx.fillStyle = '#8b929e';
-      ctx.font = 'bold 9px Arial, sans-serif';
-      ctx.fillText('—', ringCenterX, ringCenterY + 10);
+      if (metrics && metrics.missingStoryPoints) {
+        ctx.fillStyle = '#f59e0b';
+        ctx.font = 'bold 8px Arial, sans-serif';
+        ctx.fillText('NO SP', ringCenterX, ringCenterY + 10);
+      } else {
+        ctx.fillStyle = '#8b929e';
+        ctx.font = 'bold 9px Arial, sans-serif';
+        ctx.fillText('—', ringCenterX, ringCenterY + 10);
+      }
     } else {
       ctx.fillStyle = '#ffffff';
       ctx.font = 'bold 20px Arial, sans-serif';
@@ -290,7 +335,7 @@ export const SectionScorecard = {
     ctx.fillText('Avg res: ', 386, metricY);
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 11.5px Arial, sans-serif';
-    ctx.fillText(hasData ? `${metrics.avgRes}` : '—', 432, metricY);
+    ctx.fillText(hasData && metrics.avgRes && !metrics.avgRes.includes('NaN') ? `${metrics.avgRes}` : '—', 432, metricY);
 
     return canvas.toDataURL('image/png');
   },
@@ -298,11 +343,13 @@ export const SectionScorecard = {
   /**
    * Renders the exact Outlook MSO HTML for Quality Scorecard section
    */
-  renderMsoHtml(scorecardBase64) {
+  renderMsoHtml(scorecardBase64, metrics = null) {
+    const titleAttr = metrics && metrics.errorMessage ? ` title="${metrics.errorMessage.replace(/"/g, '&quot;')}"` : '';
+    const altAttr = metrics && metrics.missingStoryPoints ? 'Scorecard Uncomputed - Story Points Required' : 'Quality Scorecard';
     return `
 <h2 class=MsoHeading2 style='mso-style-name:"Heading 2";mso-outline-level:2;margin-top:12.0pt;margin-right:0in;margin-bottom:6.0pt;margin-left:0in;page-break-after:avoid;font-size:15.0pt;font-family:"Segoe UI",Arial,sans-serif;color:#0F4761;font-weight:bold'><span class=Heading2Char style='mso-style-name:"Heading 2 Char";font-size:15.0pt;font-family:"Segoe UI",Arial,sans-serif;color:#0F4761;font-weight:bold;mso-fareast-font-family:"Times New Roman"'>Quality Scorecard<o:p></o:p></span></h2>
 <p class=MsoNormal><o:p>&nbsp;</o:p></p>
-<p class=MsoNormal><img width=506 height=100 src="${scorecardBase64}" style='height:1.042in;width:5.27in'></p>
+<p class=MsoNormal><img width=506 height=100 src="${scorecardBase64}"${titleAttr} alt="${altAttr}" style='height:1.042in;width:5.27in'></p>
 <p class=MsoNormal><o:p>&nbsp;</o:p></p>
 `;
   }

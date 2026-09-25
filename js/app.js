@@ -1244,7 +1244,7 @@ function renderLiveStats() {
   });
 
   const scoreMetrics = SectionScorecard.computeQualityScore({
-    storyPoints: state.scorecardParams?.storyPoints || 22,
+    storyPoints: state.scorecardParams?.storyPoints,
     reopened: reopenedCount,
     closed: closedCount,
     severityCounts: counts
@@ -1253,12 +1253,13 @@ function renderLiveStats() {
   const badgeEl = document.getElementById('live-scorecard-badge');
   if (badgeEl) {
     const isZero = counts.total === 0;
+    const tooltip = scoreMetrics.errorMessage ? ` title="${escapeHtml(scoreMetrics.errorMessage)}"` : '';
     badgeEl.innerHTML = `
-      <div class="score-circle" style="border-color:${scoreMetrics.ringColor}">
+      <div class="score-circle" style="border-color:${scoreMetrics.ringColor}"${tooltip}>
         <div class="score-val">${scoreMetrics.score}</div>
-        <div class="score-lbl">${scoreMetrics.grade}</div>
+        <div class="score-lbl" style="${scoreMetrics.missingStoryPoints ? 'color:#b45309;font-weight:bold;' : ''}">${scoreMetrics.missingStoryPoints ? 'NO SP' : scoreMetrics.grade}</div>
       </div>
-      <div>
+      <div${tooltip}>
         <div style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase">Live Score Preview</div>
         <div style="font-size:12px;color:#374151;margin-top:2px">
           Density: <strong>${scoreMetrics.density}${isZero ? '' : '/SP'}</strong> &bull; 
