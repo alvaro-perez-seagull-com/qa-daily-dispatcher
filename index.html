@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Seagull QA Daily Dispatcher</title>
-  <link rel="stylesheet" href="css/styles.css?v=5">
+  <link rel="stylesheet" href="css/styles.css?v=32">
 </head>
 <body>
   <div class="app-container">
@@ -40,7 +40,7 @@
     <section id="panel-setup" class="tab-panel active">
       <div id="setup-validation-banner" class="validation-banner">
         <span>⚠️</span>
-        <div>Please provide at least one key: <strong>IDEA Jira Key</strong> or <strong>Epic Jira Key</strong> (or both) before proceeding.</div>
+        <div>Please provide a valid <strong>Jira Key</strong> (IDEA or Epic) and enter <strong>Feature Story Points (SP)</strong> before proceeding.</div>
       </div>
 
       <div class="grid-2">
@@ -127,14 +127,15 @@
           <div class="form-group">
             <label>
               Feature Story Points
-              <span class="tooltip-wrapper" tabindex="0">
+              <span class="tooltip-wrapper">
                 <span class="tooltip-icon">i</span>
                 <span class="tooltip-box">
                   Enter the total story points for the feature or scope being tested (e.g. 22 SP). The Quality Scorecard uses this number to calculate Defect Density (Defects / Story Points) rather than total test case count, preventing metric distortion.
                 </span>
               </span>
             </label>
-            <input type="number" id="input-sp" class="form-control" placeholder="e.g. 22" min="0.1" step="any">
+            <input type="number" id="input-sp" class="form-control" placeholder="e.g. 22" min="0.1" step="any" oninput="handleSpInput(this.value)">
+            <small id="sp-error" class="field-error-msg" style="display:none">Please enter Feature Story Points (SP &gt; 0) to proceed</small>
           </div>
           <div style="margin-top:20px;padding:14px;background:var(--bg-subtle);border-radius:8px;border:1px solid var(--border);font-size:12px;color:var(--text-muted);line-height:1.5">
             <strong style="color:var(--primary);display:block;margin-bottom:4px">💡 Outlook Distribution:</strong>
@@ -427,6 +428,6 @@
   <div id="toast" class="toast"></div>
 
   <!-- ES Module Application Entrypoint -->
-  <script type="module" src="js/app.js?v=30"></script>
+  <script type="module" src="js/app.js?v=32"></script>
 </body>
 </html>

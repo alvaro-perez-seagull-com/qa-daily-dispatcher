@@ -7,7 +7,10 @@ A client-side web application designed for Seagull Software QA teams to automate
 ## Features
 
 - **Strict Outlook / Word MSO HTML Formatting:** Produces pixel-perfect Word 15 MSO email markup (`xmlns:v`, `xmlns:o`, `xmlns:w`, `mso-yfti-tbllook`, `#B3CEFB` headers, point-based column widths).
-- **Automated Quality Scorecard Engine:** Implements Christian Velasco's exact scoring algorithm, computes composite scores, and renders the `100 Excellent` score badge directly onto an offscreen HTML5 canvas to embed as a base64 image (no manual screenshotting or cropping required).
+- **Automated Quality Scorecard Engine:** Implements Christian Velasco's exact scoring algorithm, computes composite scores, and renders the score badge directly onto an offscreen HTML5 canvas to embed as a base64 image (no manual screenshotting or cropping required).
+- **Zero-Defect 100% Quality Score:** Accurately evaluates initiatives with zero defects and valid Story Points to a full 100% composite score (`100 Excellent`) with an emerald green gauge ring.
+- **Mandatory Story Points Validation Gate:** Requires Feature Story Points (SP > 0) in Setup before advancing to cycles, preventing downstream metric distortion.
+- **Brand-Harmonized BarTender Palette:** Features interactive controls and buttons styled with BarTender File Librarian cerulean cyan (`#068FBE`) and deep navy (`#0F4761`).
 - **Dynamic Bugs by Severity Chart:** Auto-aggregates defects from the bug table by severity (SEV 1–SEV 5) and generates an offscreen canvas distribution chart.
 - **Auto-Calculated Defect Age:** Automatically computes defect age in days: `(Current Date - Date Created)`.
 - **Automatic Summary Calculations:** Computes aggregate test cycle metrics (total test cases, progress, pass rate, and issue counts).
@@ -42,6 +45,21 @@ qa-daily-dispatcher/
 ---
 
 ## Release History & Changelog
+
+### `0.0.8` — Zero-Defect 100% Quality Score, Mandatory SP Gate & Brand-Harmonized UI
+- **Zero-Defect 100% Score Realization:** Updated `computeQualityScore()` so that projects with zero defects and valid Story Points correctly satisfy turnaround SLA targets (`scoreAvgRes = 100`), generating an authentic composite score of **100 (Excellent)** with an emerald green ring (`#3B6D11` / `#22c55e`).
+- **Empty Defect Table Guidance:** Updated empty bug table messaging to celebrate clean quality states and guide users:
+  > *"No defects logged yet; the quality score is 100! If you want to add bugs, either paste from JIRA, or click 'add bug' to add them manually."*
+- **Mandatory Feature Story Points Validation Gate:** 
+  - Integrated Story Points validation (`rawSp !== '' && numSp > 0`) directly into `validateKeyGate()` alongside Jira issue keys.
+  - The "Continue to Cycles &rarr;" action button and downstream navigation tabs remain locked until valid Story Points are provided.
+  - Added inline field error helper text and contextual toast notifications (`⚠️ Feature Story Points (SP) is required to proceed.`) with automatic field focusing.
+  - Preserved clean placeholder state (`—` / `NO SP` with amber indicator ring) upon form reset.
+- **Keyboard Tab Order Optimization:** Removed `tabindex="0"` from the Feature Story Points tooltip icon wrapper (`.tooltip-wrapper`), allowing keyboard focus to traverse smoothly from **QA Engineer Name** directly into the **Feature Story Points** input field.
+- **Brand-Harmonized Button Hover Styling:** Resolved an issue where blue buttons appeared transparent or white on hover by explicitly styling all `.btn-primary` and `.btn-secondary` hover states with the BarTender File Librarian cyan/cerulean palette (`#068FBE`) and crisp white text (`#ffffff`) across all dashboard tabs and modal dialogs.
+- **Canvas Feature Detection:** Added `typeof ctx.roundRect === 'function'` check with a fallback to `ctx.rect` when rendering scorecard badges, preventing runtime exceptions on older browsers or canvas environments lacking native `roundRect` support.
+- **Scorecard Metric Documentation:** Documented the architectural rationale behind computing `scoreEscape` with 0.00% weighting in `primaryScore` to mirror the live preview specification while preserving calculations for future full-scorecard expansion.
+- **Asset Cache-Busting:** Bumped script and stylesheet query parameters to `?v=32` to guarantee immediate asset delivery and prevent stale browser caching.
 
 ### `0.0.7` — Story Points Validation Gate & NaN Turnaround Hardening
 - **Story Points Validation Gate:** Gated `computeQualityScore()` in `SectionScorecard` to reject missing, blank, zero, or non-finite inputs without silent default fallbacks.

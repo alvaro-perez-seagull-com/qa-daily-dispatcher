@@ -6,8 +6,10 @@
   --text-muted: #6b7280;
   --border: #e5e7eb;
   --primary: #0F4761;
-  --primary-hover: #082E40;
+  --primary-hover: #068FBE;
   --accent-blue: #185FA5;
+  --accent-blue-hover: #068FBE;
+  --accent-cyan: #068FBE;
   --accent-green: #3B6D11;
   --accent-red: #A32D2D;
   --font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
@@ -312,9 +314,9 @@ textarea.form-control {
 }
 
 .btn-input-action:hover:not(:disabled) {
-  background: var(--bg-subtle);
-  border-color: var(--accent-blue);
-  color: var(--accent-blue);
+  background: #f0f9ff;
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
 }
 
 .btn-input-action:active:not(:disabled) {
@@ -355,6 +357,7 @@ textarea.form-control {
 
 .btn:hover {
   background: var(--bg-subtle);
+  color: var(--text-main);
 }
 
 .btn-primary {
@@ -363,13 +366,33 @@ textarea.form-control {
   color: #ffffff;
 }
 
-.btn-primary:hover {
-  background: var(--primary-hover);
+.btn-primary:hover:not(:disabled) {
+  background: var(--accent-cyan);
+  border-color: var(--accent-cyan);
+  color: #ffffff;
 }
 
 .btn-secondary {
   background: var(--accent-blue);
   border-color: var(--accent-blue);
+  color: #ffffff;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--accent-cyan);
+  border-color: var(--accent-cyan);
+  color: #ffffff;
+}
+
+.btn-secondary.btn-icon {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+  color: #ffffff;
+}
+
+.btn-secondary.btn-icon:hover:not(:disabled) {
+  background: var(--accent-cyan);
+  border-color: var(--accent-cyan);
   color: #ffffff;
 }
 

@@ -1,12 +1,12 @@
-import { SectionIntro } from './section-intro.js?v=22';
-import { SectionSummary } from './section-summary.js?v=22';
-import { SectionScorecard } from './section-scorecard.js?v=22';
-import { SectionBugsChart } from './section-bugs-chart.js?v=22';
-import { SectionBugsList } from './section-bugs-list.js?v=22';
-import { SectionLinks } from './section-links.js?v=22';
-import { TemplateMso } from './template-mso.js?v=22';
-import { ClipboardHelper } from './clipboard.js?v=22';
-import { JiraImporter } from './jira-importer.js?v=22';
+import { SectionIntro } from './section-intro.js?v=32';
+import { SectionSummary } from './section-summary.js?v=32';
+import { SectionScorecard } from './section-scorecard.js?v=32';
+import { SectionBugsChart } from './section-bugs-chart.js?v=32';
+import { SectionBugsList } from './section-bugs-list.js?v=32';
+import { SectionLinks } from './section-links.js?v=32';
+import { TemplateMso } from './template-mso.js?v=32';
+import { ClipboardHelper } from './clipboard.js?v=32';
+import { JiraImporter } from './jira-importer.js?v=32';
 
 const STORAGE_KEY = 'seagull_dispatcher_v1';
 
@@ -327,19 +327,25 @@ function validateKeyFormat(type, rawVal) {
   return { valid: false, empty: false, cleanKey, error: 'Unknown key type' };
 }
 
-// Validation Gate: Require at least ONE valid key (IDEA or Epic), and NO invalid keys
+// Validation Gate: Require at least ONE valid key (IDEA or Epic), NO invalid keys, and valid Feature Story Points (> 0)
 function validateKeyGate(showUI = false) {
   const ideaInput = document.getElementById('input-idea-key');
   const epicInput = document.getElementById('input-epic-key');
+  const spInput = document.getElementById('input-sp');
+  const spError = document.getElementById('sp-error');
+
   const ideaVal = (ideaInput ? ideaInput.value : (state.introData.ideaKey || '')).trim();
   const epicVal = (epicInput ? epicInput.value : (state.introData.epicKey || '')).trim();
+  const rawSp = spInput ? spInput.value.trim() : (state.scorecardParams?.storyPoints !== null && state.scorecardParams?.storyPoints !== undefined ? String(state.scorecardParams.storyPoints) : '');
+  const numSp = Number(rawSp);
+  const hasValidSp = rawSp !== '' && Number.isFinite(numSp) && numSp > 0;
 
   const ideaCheck = validateKeyFormat('idea', ideaVal);
   const epicCheck = validateKeyFormat('epic', epicVal);
 
   const hasAtLeastOneKey = (!ideaCheck.empty && ideaCheck.valid) || (!epicCheck.empty && epicCheck.valid);
   const hasNoInvalidKeys = ideaCheck.valid && epicCheck.valid;
-  const isValid = hasAtLeastOneKey && hasNoInvalidKeys;
+  const isValid = hasAtLeastOneKey && hasNoInvalidKeys && hasValidSp;
 
   const banner = document.getElementById('setup-validation-banner');
   const continueBtn = document.getElementById('btn-continue-cycles');
@@ -358,22 +364,69 @@ function validateKeyGate(showUI = false) {
     banner?.classList.add('show');
     if (!ideaCheck.valid) ideaInput?.classList.add('input-error');
     if (!epicCheck.valid) epicInput?.classList.add('input-error');
+    if (!hasValidSp) {
+      spInput?.classList.add('input-error');
+      if (spError) spError.style.display = 'block';
+    } else {
+      spInput?.classList.remove('input-error');
+      if (spError) spError.style.display = 'none';
+    }
   } else if (isValid || !showUI) {
     banner?.classList.remove('show');
     if (ideaCheck.valid) ideaInput?.classList.remove('input-error');
     if (epicCheck.valid) epicInput?.classList.remove('input-error');
+    if (hasValidSp) {
+      spInput?.classList.remove('input-error');
+      if (spError) spError.style.display = 'none';
+    }
   }
 
   return isValid;
 }
+
+window.handleSpInput = function(val) {
+  const cleanVal = (val || '').trim();
+  const num = parseFloat(cleanVal);
+  state.scorecardParams.storyPoints = (cleanVal !== '' && !isNaN(num) && num > 0) ? num : null;
+  const spInput = document.getElementById('input-sp');
+  const spError = document.getElementById('sp-error');
+  if (state.scorecardParams.storyPoints !== null) {
+    spInput?.classList.remove('input-error');
+    if (spError) spError.style.display = 'none';
+  }
+  validateKeyGate(false);
+  renderLiveStats();
+  renderPreview();
+  saveState();
+};
 
 // Global exposure for UI events
 window.switchTab = function(tabName) {
   if (tabName !== 'setup') {
     syncInputsToState();
     if (!validateKeyGate(true)) {
-      showToast('⚠️ Please enter a valid IDEA Key or Epic Key (or both) before proceeding.');
-      document.getElementById('input-idea-key')?.focus();
+      const spInput = document.getElementById('input-sp');
+      const rawSp = spInput ? spInput.value.trim() : '';
+      const numSp = Number(rawSp);
+      const hasValidSp = rawSp !== '' && Number.isFinite(numSp) && numSp > 0;
+
+      const ideaInput = document.getElementById('input-idea-key');
+      const epicInput = document.getElementById('input-epic-key');
+      const ideaVal = (ideaInput ? ideaInput.value : '').trim();
+      const epicVal = (epicInput ? epicInput.value : '').trim();
+      const ideaCheck = validateKeyFormat('idea', ideaVal);
+      const epicCheck = validateKeyFormat('epic', epicVal);
+      const hasKey = (!ideaCheck.empty && ideaCheck.valid) || (!epicCheck.empty && epicCheck.valid);
+
+      if (!hasKey) {
+        showToast('⚠️ Please enter a valid IDEA Key or Epic Key (or both) before proceeding.');
+        document.getElementById('input-idea-key')?.focus();
+      } else if (!hasValidSp) {
+        showToast('⚠️ Feature Story Points (SP) is required to proceed.');
+        document.getElementById('input-sp')?.focus();
+      } else {
+        showToast('⚠️ Please correct the errors in the Setup form before proceeding.');
+      }
       return;
     }
   }
@@ -392,8 +445,28 @@ window.switchTab = function(tabName) {
 window.proceedToCycles = function() {
   syncInputsToState();
   if (!validateKeyGate(true)) {
-    showToast('⚠️ Please enter a valid IDEA Key or Epic Key (or both) before proceeding.');
-    document.getElementById('input-idea-key')?.focus();
+    const spInput = document.getElementById('input-sp');
+    const rawSp = spInput ? spInput.value.trim() : '';
+    const numSp = Number(rawSp);
+    const hasValidSp = rawSp !== '' && Number.isFinite(numSp) && numSp > 0;
+
+    const ideaInput = document.getElementById('input-idea-key');
+    const epicInput = document.getElementById('input-epic-key');
+    const ideaVal = (ideaInput ? ideaInput.value : '').trim();
+    const epicVal = (epicInput ? epicInput.value : '').trim();
+    const ideaCheck = validateKeyFormat('idea', ideaVal);
+    const epicCheck = validateKeyFormat('epic', epicVal);
+    const hasKey = (!ideaCheck.empty && ideaCheck.valid) || (!epicCheck.empty && epicCheck.valid);
+
+    if (!hasKey) {
+      showToast('⚠️ Please enter a valid IDEA Key or Epic Key (or both) before proceeding.');
+      document.getElementById('input-idea-key')?.focus();
+    } else if (!hasValidSp) {
+      showToast('⚠️ Feature Story Points (SP) is required to proceed.');
+      document.getElementById('input-sp')?.focus();
+    } else {
+      showToast('⚠️ Please correct the errors in the Setup form before proceeding.');
+    }
     return;
   }
   window.switchTab('summary');
@@ -575,15 +648,18 @@ window.confirmResetForm = function() {
   const epicErr = document.getElementById('epic-key-error');
   const epicHint = document.getElementById('epic-key-hint');
   const dateErr = document.getElementById('start-date-error');
+  const spErr = document.getElementById('sp-error');
   if (ideaErr) ideaErr.style.display = 'none';
   if (ideaHint) ideaHint.style.display = 'block';
   if (epicErr) epicErr.style.display = 'none';
   if (epicHint) epicHint.style.display = 'block';
   if (dateErr) dateErr.style.display = 'none';
+  if (spErr) spErr.style.display = 'none';
 
   document.getElementById('input-idea-key')?.classList.remove('input-error');
   document.getElementById('input-epic-key')?.classList.remove('input-error');
   document.getElementById('input-start-date')?.classList.remove('input-error');
+  document.getElementById('input-sp')?.classList.remove('input-error');
   const nativePicker = document.getElementById('native-date-picker');
   if (nativePicker) nativePicker.value = '';
 
@@ -1014,7 +1090,7 @@ function renderBugsTable() {
 
   if (state.bugs.length === 0) {
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td colspan="9" style="text-align:center;color:var(--text-muted);padding:18px">No defects logged yet. Click <strong>📋 Paste from Jira</strong> or <strong>+ Add Bug</strong> above.</td>`;
+    tr.innerHTML = `<td colspan="9" style="text-align:center;color:var(--text-muted);padding:18px;line-height:1.6">No defects logged yet; the quality score is 100! If you want to add bugs, either paste from JIRA, or click 'add bug' to add them manually.</td>`;
     tbody.appendChild(tr);
   } else {
     state.bugs.forEach((b, idx) => {
