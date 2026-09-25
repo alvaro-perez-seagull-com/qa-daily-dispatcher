@@ -133,6 +133,13 @@ export const SectionScorecard = {
 
     // 2. Primary Metric Scores (0-100)
     const scoreDensity = this.scoreTier(rawDensity, [0.005, 0.01, 0.03]);
+    // NOTE: scoreEscape is intentionally computed but weighted at 0.00 in primaryScore
+    // to match the source tool's Live Score Preview widget (which excludes escape rate
+    // from the live badge, reserving it for full scorecard/history views). It is kept in place
+    // rather than removed so the computation does not need to be re-derived if surfaced
+    // in a future, more complete view. Anyone changing this weight away from 0.00 should
+    // also decide whether scoreEscape needs to be added to the returned metrics object,
+    // since it is currently not exposed in the return payload.
     const scoreEscape = this.scoreTier(rawEscape, [0.01, 0.03, 0.05]);
     const scoreReopen = this.scoreTier(rawReopen, [0.03, 0.07, 0.15]);
     const scoreS1Rate = this.scoreTier(rawS1Rate, [0, 0, 0]);
