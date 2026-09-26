@@ -46,6 +46,12 @@ qa-daily-dispatcher/
 
 ## Release History & Changelog
 
+### `0.0.9` — Local Timezone Subject Line Formatting & Session Deserialization
+- **Local Browser Timezone Subject Formatting:** Replaced UTC-dependent `new Date().toISOString().split('T')[0]` with `SectionIntro.getLocalIsoDate(data?.sentDate)`. This prevents evening date rollover past 5:00 PM in Western/Pacific timezones (UTC-7) and guarantees that generated subject lines always match the engineer's active calendar day.
+- **Wrapped Session State Deserialization:** Enhanced `loadSavedState()` in `app.js` with `if (parsed.state) parsed = parsed.state` to seamlessly parse both raw state and schema-wrapped session JSON files upon page reload.
+- **Local Fallback for Defect Timestamps:** Updated default `dateCreated` in `addBugRow()` and `JiraImporter` to format timestamps in local browser time rather than UTC.
+- **Asset Cache-Busting:** Bumped script and stylesheet query parameters to `?v=33`.
+
 ### `0.0.8` — Zero-Defect 100% Quality Score, Mandatory SP Gate & Brand-Harmonized UI
 - **Zero-Defect 100% Score Realization:** Updated `computeQualityScore()` so that projects with zero defects and valid Story Points correctly satisfy turnaround SLA targets (`scoreAvgRes = 100`), generating an authentic composite score of **100 (Excellent)** with an emerald green ring (`#3B6D11` / `#22c55e`).
 - **Empty Defect Table Guidance:** Updated empty bug table messaging to celebrate clean quality states and guide users:
@@ -98,3 +104,10 @@ qa-daily-dispatcher/
 - **Embedded Quality Scorecard:** Automated composite score computation and offscreen canvas badge generation.
 - **Dynamic Severity Chart:** Automatic defect distribution chart rendering.
 - **One-Click Clipboard Copying:** Async multi-MIME HTML clipboard copy handler (`text/html`).
+
+---
+
+## 🔮 Roadmap & Future Features
+
+To view upcoming features, architectural spikes, and contribute ideas, check out the [Feature Wishlist & Roadmap Backlog](file:///Users/aperez/SEAGULL/SEA2026-WSQA01/98-Projects/qa-daily-dispatcher/WISHLIST.md).
+

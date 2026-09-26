@@ -1,12 +1,12 @@
-import { SectionIntro } from './section-intro.js?v=32';
-import { SectionSummary } from './section-summary.js?v=32';
-import { SectionScorecard } from './section-scorecard.js?v=32';
-import { SectionBugsChart } from './section-bugs-chart.js?v=32';
-import { SectionBugsList } from './section-bugs-list.js?v=32';
-import { SectionLinks } from './section-links.js?v=32';
-import { TemplateMso } from './template-mso.js?v=32';
-import { ClipboardHelper } from './clipboard.js?v=32';
-import { JiraImporter } from './jira-importer.js?v=32';
+import { SectionIntro } from './section-intro.js?v=33';
+import { SectionSummary } from './section-summary.js?v=33';
+import { SectionScorecard } from './section-scorecard.js?v=33';
+import { SectionBugsChart } from './section-bugs-chart.js?v=33';
+import { SectionBugsList } from './section-bugs-list.js?v=33';
+import { SectionLinks } from './section-links.js?v=33';
+import { TemplateMso } from './template-mso.js?v=33';
+import { ClipboardHelper } from './clipboard.js?v=33';
+import { JiraImporter } from './jira-importer.js?v=33';
 
 const STORAGE_KEY = 'seagull_dispatcher_v1';
 
@@ -34,7 +34,8 @@ function loadSavedState() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
-      const parsed = JSON.parse(saved);
+      let parsed = JSON.parse(saved);
+      if (parsed.state) parsed = parsed.state;
       if (parsed.introData) Object.assign(state.introData, parsed.introData);
       if (parsed.cycles) {
         state.cycles = parsed.cycles.map(c => {
@@ -740,7 +741,7 @@ window.removeCycleRow = function(index) {
 };
 
 window.addBugRow = function() {
-  const today = new Date().toISOString().split('T')[0] + "T00:00:00";
+  const today = SectionIntro.getLocalIsoDate() + "T00:00:00";
   state.bugs.push({
     type: "Bug",
     key: "BPLAT-",

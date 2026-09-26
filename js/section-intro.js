@@ -61,13 +61,24 @@ export const SectionIntro = {
   },
 
   /**
+   * Returns a date formatted as YYYY-MM-DD in the local browser timezone
+   */
+  getLocalIsoDate(date = new Date()) {
+    const d = (date instanceof Date && !isNaN(date.getTime())) ? date : new Date(date || Date.now());
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  },
+
+  /**
    * Generates the subject line matching Seagull QA rules:
    * 1. Both IDEA and EPIC: Product vX.Y: [IDEA-NNN] - EPIC# - Feature Name - Daily Status - YYYY-MM-DD
    * 2. IDEA only:          Product vX.Y: [IDEA-NNN] Feature Name - Daily Status - YYYY-MM-DD
    * 3. EPIC only:          Product vX.Y: EPIC# - Feature Name - Daily Status - YYYY-MM-DD
    */
   generateSubject(data) {
-    const today = new Date().toISOString().split('T')[0];
+    const today = this.getLocalIsoDate(data?.sentDate);
     const idea = (data.ideaKey || '').trim();
     const epic = (data.epicKey || '').trim();
 

@@ -276,7 +276,7 @@ export const JiraImporter = {
       });
 
       if (!summary) summary = `${key} defect item`;
-      if (!dateCreated) dateCreated = new Date().toISOString().split('T')[0] + 'T00:00:00';
+      if (!dateCreated) dateCreated = this.getLocalIsoDate() + 'T00:00:00';
       if (age === null || isNaN(age)) age = this.calculateAgeFallback(dateCreated);
 
       bugs.push({
@@ -566,7 +566,7 @@ export const JiraImporter = {
       }
     }
     if (!dateCreated) {
-      dateCreated = new Date().toISOString().split('T')[0] + 'T00:00:00';
+      dateCreated = this.getLocalIsoDate() + 'T00:00:00';
     }
 
     // Severity - Strict matching (never match arbitrary numbers)
@@ -725,5 +725,16 @@ export const JiraImporter = {
     if (isNaN(created.getTime())) return 0;
     const diff = Math.max(0, new Date().getTime() - created.getTime());
     return Math.floor(diff / (1000 * 60 * 60 * 24));
+  },
+
+  /**
+   * Returns current local date in YYYY-MM-DD format (local browser timezone)
+   */
+  getLocalIsoDate(date = new Date()) {
+    const d = (date instanceof Date && !isNaN(date.getTime())) ? date : new Date(date || Date.now());
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 };
