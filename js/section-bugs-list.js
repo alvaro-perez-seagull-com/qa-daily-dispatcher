@@ -37,7 +37,8 @@ export const SectionBugsList = {
     if (!dateCreated) return 0;
     const created = new Date(dateCreated);
     if (isNaN(created.getTime())) return 0;
-    const diffTime = Math.max(0, referenceDate.getTime() - created.getTime());
+    const ref = (referenceDate instanceof Date && !isNaN(referenceDate.getTime())) ? referenceDate : new Date(referenceDate || Date.now());
+    const diffTime = Math.max(0, ref.getTime() - created.getTime());
     return Math.floor(diffTime / (1000 * 60 * 60 * 24));
   },
 
