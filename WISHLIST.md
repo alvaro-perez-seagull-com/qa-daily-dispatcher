@@ -16,11 +16,23 @@ This document tracks prospective feature requests, UX enhancements, and architec
 
 ### 1. Multi-Epic Support (`💡 Idea / In Discussion`)
 * **Problem Statement:** Large initiatives (or QA engineers overseeing multiple feature tracks within the same sprint) often touch 2 or more related Jira Epics (e.g., frontend Forms Designer Epic + backend Print Execution Engine Epic). Currently, Setup strictly accepts one Primary Epic Key.
-* **Proposed Concepts:**
-  * **Option A (Multi-Tag / Token Input):** Allow comma-separated or tokenized Epic entry (e.g., `BPLAT-20767, BPLAT-21440`). Jira bug filter JQL dynamically combines them (`labels IN (BPLAT-20767, BPLAT-21440)`).
-  * **Option B (Multi-Epic Table):** Define an Epics table in Setup with individual Initiative Names and Story Point allocations, auto-summing total Story Points for Defect Density calculations.
-  * **Subject Line Impact:** Needs formatting consensus (e.g., `BTC v12.6: [IDEA-3110 / BPLAT-20767, BPLAT-21440] ...` vs. primary epic fallback).
-  * **Email "Links" Section Traceability:** When multiple Epics are configured, the generated Outlook email "Links" section must render dedicated links for *all* associated Epics (e.g., `Epic (Frontend): [BPLAT-20767](...)`, `Epic (Backend): [BPLAT-21440](...)`) rather than linking only the primary Epic.
+* **Agreed Interaction Specification (Chip / Token Multi-Input):**
+  1. **Tokenization on Completion:** When a user types a complete Epic key (e.g., `BPLAT-100`), entering a **Space** or **Comma** (or pressing **Enter**) converts the key into an inline chip/token badge within the input container.
+  2. **Subsequent Keys:** The user can continue typing additional Epic keys (e.g., `BPLAT-101`), each converting to its own chip/token in sequence.
+  3. **Chip Removal Button:** Each chip appears with a remove button (e.g., `[ [×] BPLAT-100 ]`) allowing the user to delete/remove individual tokens with a single click.
+  4. **Keyboard Deletion (Backspace):** When the text cursor is in an empty state within the input, pressing **Backspace / Delete** removes the preceding chip.
+  5. **Dynamic Filter URL Generation:** The Jira bug filter JQL dynamically combines all tokenized Epics into the label clause (e.g., `labels IN (BPLAT-100, BPLAT-101)`). If only one Epic is entered, it generates standard single-label JQL as before.
+  6. **Email "Links" & Subject Traceability:**
+     - The generated Outlook email "Links" section renders direct browse links for *all* active Epics individually (e.g., `Epic (BPLAT-100): [BPLAT-100](...)`, `Epic (BPLAT-101): [BPLAT-101](...)`).
+     - The **Jira - List of Bugs** link uses the exact unified multi-epic filter URL generated in Section 1.
+     - **Subject Line Formatting (Pending QA Lead Approval):** Format consensus is pending formal approval from QA Leads. Current working recommendation is forward-slash separation (e.g., `BTC v12.6: [IDEA-3110 / BPLAT-20766/BPLAT-20767] - ...` or `BTC v12.6: [BPLAT-20766/BPLAT-20767] - ...`).
+  7. **Unified Defect Ingestion & Severity Chart:**
+     - Because the generated filter URL searches across all configured Epics (`labels IN (BPLAT-100, BPLAT-101)`), defect imports/pastes in Tab 3 (List of Bugs Found) automatically aggregate defects across all associated Epics.
+     - The **Bugs by Severity Chart** and **Defect Distribution Table** in Tab 4 (Live Email Preview) automatically reflect the combined defect metrics across all Epics.
+  8. **Quality Scorecard & Defect Density:**
+     - The Quality Scorecard calculation organically evaluates total defects across all Epics against total feature Story Points, ensuring accurate composite scoring and SLA adherence.
+  9. **Session Import Forward-Compatibility & Dynamic Subject Refresh:**
+     - If a user imports an older single-epic session JSON and subsequently adds a second Epic in Setup, the Live Preview engine must dynamically re-evaluate the Subject line rather than retaining the stale imported single-epic string.
 
 ---
 
@@ -101,11 +113,12 @@ This document tracks prospective feature requests, UX enhancements, and architec
 
 ---
 
-### 9. Live Email Preview Navigation & Action Button Labels (`💡 Idea / In Discussion`)
-* **Problem Statement:** In Tab 4 (Live Email Preview), users currently only have a `Copy Email Body` button, `Export Session (.JSON)` button, and `Reset / Clear All` button. There is no rapid navigation control to jump back to Tab 3 (List of Bugs Found) if an edit is needed before sending. Furthermore, the `.JSON` file extension in the button label is redundant and clutters the UI.
-* **Proposed Scope:**
-  * **"← Back to Bugs" Navigation Link/Button:** Add a navigation button placed first on the left in Tab 4's action toolbar (preceding `Export Session`). Clicking switches the active view directly back to Tab 3 (List of Bugs Found).
-  * **Button Label Cleanup:** Change `Export Session (.JSON)` to simply `Export Session`.
+### 9. Live Email Preview Navigation & Action Button Labels (`✅ Completed / Released`)
+* **Problem Statement:** In Tab 4 (Live Email Preview), users previously had no rapid navigation control to jump back to Tab 3 (List of Bugs Found) if a defect edit was needed before sending. Furthermore, the `.JSON` file extension in the button label was redundant.
+* **Delivered Solution:**
+  * Added a standard **"← Back to Bugs"** button on the bottom-left of Tab 4's action toolbar (`onclick="switchTab('bugs')"`).
+  * Cleaned up the export action button label to simply **"Export Session"**.
+  * Organized bottom actions into a clear left group (`[ ← Back to Bugs ]`, `[ Export Session ]`) and right group (`[ Copy Formatted Email ]`).
 
 ---
 
@@ -129,38 +142,46 @@ This document tracks prospective feature requests, UX enhancements, and architec
 
 ---
 
+### 12. Bugs Severity Chart Subtitle: Rename 'Total Active Defects' to 'Total Defects' (`✅ Completed / Released`)
+* **Problem Statement:** In the Bugs by Severity chart generated on offscreen canvas (`SectionBugsChart`), the subtitle previously read `"Total Active Defects: X"`. However, if defects logged in the table are Resolved or Closed, they are no longer "active", making the label technically inaccurate.
+* **Delivered Solution:**
+  * Updated canvas subtitle rendering in `SectionBugsChart.generateChartImage()` from `"Total Active Defects: ${totalBugs}"` to `"Total Defects: ${totalBugs}"`.
+  * Guarantees that the chart subtitle reflects total logged defects (active, resolved, or closed) consistently with the defect table.
+
+---
+
 ## 🤖 AI-Generated Recommendations
 
-### 12. Jira Cloud Direct Filter API Sync (OAuth / Personal Access Token)
+### 13. Jira Cloud Direct Filter API Sync (OAuth / Personal Access Token)
 * **Value:** Eliminates the manual step of opening Jira in another tab, highlighting rows, and pasting clipboard text.
 * **Mechanism:** Optional field in Setup to save a Jira PAT or API token. A single **"Fetch Bugs from Jira"** button executes the generated JQL query via Jira REST API (`/rest/api/3/search`) and directly populates the defect table in seconds.
 
 ---
 
-### 13. Zephyr Scale Test Cycle Auto-Import
+### 14. Zephyr Scale Test Cycle Auto-Import
 * **Value:** Removes manual cycle data entry for test case counts, pass rates, and execution status.
 * **Mechanism:** Given one or more Zephyr Cycle keys (e.g., `BPLAT-R925`, `BPLAT-R926`), fetch cycle metrics (`totalTestCases`, `executionSummaries.PASSED`, `retestCount`) via the Zephyr Scale REST API (`/v2/testcycle/{key}/executions`) and auto-populate Tab 2.
 
 ---
 
-### 14. Multi-Channel Export: Slack / Teams / Confluence Markdown
+### 15. Multi-Channel Export: Slack / Teams / Confluence Markdown
 * **Value:** Teams frequently post daily status updates in Slack or Microsoft Teams channels in addition to sending Outlook emails.
 * **Mechanism:** Add a **"Copy as Slack/Teams Markdown"** action in Tab 4 that generates clean, bulleted Slack markdown blocks with bold metrics, severity summaries, and status badges ready to paste into chat threads.
 
 ---
 
-### 15. Multi-Engineer / Co-Tester Attribution
+### 16. Multi-Engineer / Co-Tester Attribution
 * **Value:** Complex feature testing is frequently shared between 2 or more QA engineers (e.g., functional tester + automation lead).
 * **Mechanism:** Support adding multiple QA Engineer names (e.g., `Alvaro Perez, Catherine Buenafe`) that automatically format into the email greeting, sender signature, and subject metadata without manual edits.
 
 ---
 
-### 16. Project Preset Profiles (Saved Workspace Configurations)
+### 17. Project Preset Profiles (Saved Workspace Configurations)
 * **Value:** QA engineers switching between different projects during the sprint (e.g., BTC Intelligent Forms vs. BTO Licensing vs. Print Service) have to re-enter versions, links, and recipient preferences each time.
 * **Mechanism:** Allow users to save named configuration profiles (e.g., `"BTC - Intelligent Forms"`, `"BTO - Licensing Service"`) to switch entire setups with a single click.
 
 ---
 
-### 17. Day-over-Day Delta & Trend Indicators (Source Scorecard Feature Parity)
+### 18. Day-over-Day Delta & Trend Indicators (Source Scorecard Feature Parity)
 * **Value & Context:** This capability natively exists in Christian Velasco's original scorecard project, tracking day-over-day trajectory and velocity. Incorporating this aligns our email dispatcher directly with the source scoring tool.
 * **Mechanism:** Compare current session with yesterday's imported session JSON or local history snapshot to compute and render historical delta badges (e.g., `Score Delta: 85 ↗ 92 (+7 pts)`, `+3 test cases passed`, `-1 defect resolved`).

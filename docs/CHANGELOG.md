@@ -1,52 +1,10 @@
-# Seagull QA Daily Dispatcher
+# Seagull QA Daily Dispatcher — Complete Release Changelog
 
-A client-side web application designed for Seagull Software QA teams to automate the generation and copying of rigid, Microsoft Outlook / Word-compliant daily status emails for BarTender Cloud and OnPrem initiatives.
-
----
-
-## Features
-
-- **Strict Outlook / Word MSO HTML Formatting:** Produces pixel-perfect Word 15 MSO email markup (`xmlns:v`, `xmlns:o`, `xmlns:w`, `mso-yfti-tbllook`, `#B3CEFB` headers, point-based column widths).
-- **Automated Quality Scorecard Engine:** Implements Christian Velasco's exact scoring algorithm, computes composite scores, and renders the score badge directly onto an offscreen HTML5 canvas to embed as a base64 image (no manual screenshotting or cropping required).
-- **Zero-Defect 100% Quality Score:** Accurately evaluates initiatives with zero defects and valid Story Points to a full 100% composite score (`100 Excellent`) with an emerald green gauge ring.
-- **Mandatory Story Points Validation Gate:** Requires Feature Story Points (SP > 0) in Setup before advancing to cycles, preventing downstream metric distortion.
-- **Brand-Harmonized BarTender Palette:** Features interactive controls and buttons styled with BarTender File Librarian cerulean cyan (`#068FBE`) and deep navy (`#0F4761`).
-- **Dynamic Bugs by Severity Chart:** Auto-aggregates defects from the bug table by severity (SEV 1–SEV 5) and generates an offscreen canvas distribution chart.
-- **Auto-Calculated Defect Age:** Automatically computes defect age in days: `(Current Date - Date Created)`.
-- **Automatic Summary Calculations:** Computes aggregate test cycle metrics (total test cases, progress, pass rate, and issue counts).
-- **One-Click Native Outlook Clipboard Copying:** Uses the modern asynchronous Clipboard API (`new ClipboardItem({ 'text/html': ... })`) so clicking **"Copy Formatted Email"** allows you to press **Cmd+V / Ctrl+V** directly in Outlook with 100% formatting fidelity.
-- **Dedicated "Copy Subject Line" Action:** Quickly copies formatted subject lines:
-  `BTC v12.6: [IDEA-3110] Intelligent Forms: Refreshable Print Preview - Daily Status - YYYY-MM-DD`
-- **Zero Backend Dependencies:** Runs 100% in-browser, fully compatible with GitHub Pages.
+This document contains the complete historical log of all releases, architectural enhancements, fixes, and updates for the Seagull QA Daily Dispatcher.
 
 ---
 
-## Modular File Architecture
-
-```
-├── docs/
-│   └── CHANGELOG.md           # Complete historical release changelog
-├── index.html                 # Main dashboard UI & navigation
-├── css/
-│   └── styles.css             # Modern dashboard styles & responsive tables
-├── js/
-│   ├── app.js                 # Application state, UI wiring, and localStorage persistence
-│   ├── section-intro.js       # Message headers, To/Cc distribution, and opening sentence
-│   ├── section-summary.js     # Test cycle summary table & automatic Total calculation
-│   ├── section-bugs-list.js   # List of Bugs Found table with auto-calculated Age
-│   ├── section-bugs-chart.js  # Offscreen canvas generator for Bugs by Severity chart
-│   ├── section-scorecard.js   # Quality Scorecard scoring engine & offscreen canvas badge
-│   ├── section-links.js       # Traceability links (IDEA, Epic, Jira Bug Filter)
-│   ├── section-signature.js   # Official Seagull Software email signature block
-│   ├── template-mso.js        # Master MSO Word 15 HTML assembler
-│   └── clipboard.js           # Multi-MIME HTML clipboard copy handler
-├── WISHLIST.md                # Feature wishlist & roadmap backlog
-└── README.md                  # Project overview & latest release notes
-```
-
----
-
-## Release History & Changelog
+## Release History
 
 ### `0.0.10` — Stale Date Warning UI, Test Cycle READY State & Setup Action Button Harmonization
 - **Stale Session Date Warning Banner & 1-Click Refresh:**
@@ -102,11 +60,28 @@ A client-side web application designed for Seagull Software QA teams to automate
 - **Execution Start Date UX:** Implemented numeric-only keydown filtering (`0-9` and `/`) and integrated a native calendar picker button (`showPicker()`).
 - **Jira Filter URL Action Toolbar:** Replaced the wide text button with compact dual action icon buttons (Copy to Clipboard and Open Filter in Jira ↗) with dynamic active/disabled state management.
 
-> 📜 **Complete Historical Changelog:** For older releases (`0.0.1` through `0.0.5`) and full version archives, see [docs/CHANGELOG.md](docs/CHANGELOG.md).
+### `0.0.5` — Subject Line Formats, Wide Summary Table & Bottom Bug Action
+- **Dynamic Subject Line Formats:** Supported flexible Jira key combinations (`[IDEA-XXXX / BPLAT-YYYY]`, `[IDEA-XXXX]`, or `[BPLAT-YYYY]`) with automatic prefix fallback.
+- **Wide Summary Table:** Adjusted test cycle summary table column widths and spacing for improved legibility across email clients.
+- **Bottom Action Button:** Added a secondary "Add Bug" action button below the defect table for faster logging workflows.
 
----
+### `0.0.4` — High-DPI Scorecard Badge & Layout Refinement
+- **Retina 2x Resolution:** Upgraded canvas rendering with 2x supersampling (`dpr = 2`) for razor-sharp rendering on high-DPI displays.
+- **Layout Refinement:** Cleaned scorecard badge layout by removing mini pillar bars to match Christian Velasco's reference live preview gauge.
 
-## 🔮 Roadmap & Future Features
+### `0.0.3` — Exact 4-Tier QA Scorecard Engine & Unified Table Borders
+- **Exact Algorithm Alignment:** Aligned composite scoring engine with Christian Velasco's 4-tier model (Primary 50% / Severity 50%).
+- **Configured Threshold Bands:** Updated grade boundaries to Poor (<30), Moderate (30–59), Good (60–89), and Excellent (≥90).
+- **Unified Table Borders:** Standardized table borders (`border-collapse: collapse; border: 1pt solid #7F7F7F;`) for Word MSO email compatibility.
 
-To view upcoming features, architectural spikes, and contribute ideas, check out the [Feature Wishlist & Roadmap Backlog](file:///Users/aperez/SEAGULL/SEA2026-WSQA01/98-Projects/qa-daily-dispatcher/WISHLIST.md).
+### `0.0.2` — Outlook MSO Heading 2 Styles & Decimal Bug Ages
+- **Native Word Heading 2 Styles:** Applied explicit inline Word MSO Heading 2 formatting (`15pt Segoe UI`, `#0F4761`, `page-break-after: avoid`) across all section headers.
+- **Decimal Bug Age Support:** Added support for fractional defect ages (e.g., `0.8d`) in bug table parsing and display.
+- **Subject Line Key Deduplication:** Prevented duplicate Jira keys when identical identifiers were entered in both IDEA and Epic fields.
 
+### `0.0.1` — Initial Release: Seagull QA Daily Dispatcher
+- **Core Dispatcher Dashboard:** Client-side status report builder for Seagull QA initiatives.
+- **Word/Outlook MSO HTML Generator:** Strict Word 15 MSO email markup assembly.
+- **Embedded Quality Scorecard:** Automated composite score computation and offscreen canvas badge generation.
+- **Dynamic Severity Chart:** Automatic defect distribution chart rendering.
+- **One-Click Clipboard Copying:** Async multi-MIME HTML clipboard copy handler (`text/html`).

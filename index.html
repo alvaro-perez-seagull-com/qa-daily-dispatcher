@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Seagull QA Daily Dispatcher</title>
-  <link rel="stylesheet" href="css/styles.css?v=38">
+  <link rel="stylesheet" href="css/styles.css?v=41">
 </head>
 <body>
   <div class="app-container">
@@ -331,16 +331,19 @@
         <iframe id="email-preview-frame" title="Email Live Preview"></iframe>
       </div>
 
-      <!-- Bottom Actions: Export Session (Left) & Copy Formatted Email (Right) on the same line -->
+      <!-- Bottom Actions: Back to Bugs & Export Session (Left) & Copy Formatted Email (Right) on the same line -->
       <div class="preview-bottom-actions" style="display:flex;justify-content:space-between;align-items:center;width:100%;margin-top:16px">
-        <button type="button" class="btn btn-secondary" onclick="exportSessionJson()" title="Save all state and tables to a downloadable JSON file" style="display:inline-flex;align-items:center;gap:8px">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="7 10 12 15 17 10"></polyline>
-            <line x1="12" y1="15" x2="12" y2="3"></line>
-          </svg>
-          <span>Export Session (.json)</span>
-        </button>
+        <div style="display:flex;gap:10px;align-items:center">
+          <button type="button" class="btn" onclick="switchTab('bugs')" title="Return to Defect Entry Tab">&larr; Back to Bugs</button>
+          <button type="button" class="btn btn-secondary" onclick="exportSessionJson()" title="Save all state and tables to a downloadable JSON file" style="display:inline-flex;align-items:center;gap:8px">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Export Session</span>
+          </button>
+        </div>
         <button type="button" class="btn btn-primary" onclick="copyEmailToClipboard()" style="display:inline-flex;align-items:center;gap:8px">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
@@ -451,6 +454,6 @@
   <div id="toast" class="toast"></div>
 
   <!-- ES Module Application Entrypoint -->
-  <script type="module" src="js/app.js?v=38"></script>
+  <script type="module" src="js/app.js?v=40"></script>
 </body>
 </html>

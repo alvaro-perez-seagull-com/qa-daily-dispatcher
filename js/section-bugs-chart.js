@@ -50,7 +50,7 @@ export const SectionBugsChart = {
     const totalBugs = (counts.s1 || 0) + (counts.s2 || 0) + (counts.s3 || 0) + (counts.s4 || 0) + (counts.s5 || 0);
     ctx.fillStyle = '#6b7280';
     ctx.font = '12px Arial, sans-serif';
-    ctx.fillText(`Total Active Defects: ${totalBugs}`, 25, 58);
+    ctx.fillText(`Total Defects: ${totalBugs}`, 25, 58);
 
     // Chart Dimensions
     const chartLeft = 50;

@@ -1,7 +1,7 @@
 import { SectionIntro } from './section-intro.js?v=35';
 import { SectionSummary } from './section-summary.js?v=35';
 import { SectionScorecard } from './section-scorecard.js?v=35';
-import { SectionBugsChart } from './section-bugs-chart.js?v=35';
+import { SectionBugsChart } from './section-bugs-chart.js?v=39';
 import { SectionBugsList } from './section-bugs-list.js?v=35';
 import { SectionLinks } from './section-links.js?v=35';
 

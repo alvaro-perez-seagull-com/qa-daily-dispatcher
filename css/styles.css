@@ -90,8 +90,8 @@ body {
 }
 
 .score-circle {
-  width: 46px;
-  height: 46px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   border: 3.5px solid var(--accent-green);
   display: flex;
@@ -99,6 +99,7 @@ body {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 .score-val {
@@ -108,9 +109,12 @@ body {
 }
 
 .score-lbl {
-  font-size: 8px;
-  font-weight: 600;
+  font-size: 7.5px;
+  font-weight: 700;
   color: var(--text-muted);
+  line-height: 1;
+  margin-top: 1px;
+  letter-spacing: -0.1px;
 }
 
 /* Navigation Tabs */
