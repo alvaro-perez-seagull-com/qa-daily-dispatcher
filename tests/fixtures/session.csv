@@ -1,0 +1,3 @@
+cycleKey,area,productVersion,readyToTest,testingStatus,progress,passed,retest,issues,testCases
+BPLAT-R925,"BPLAT-R925: Dev Quality Gate Testing","BTC v12.6",true,COMPLETED,100,100,0,0,6
+BPLAT-R926,"BPLAT-R926: Forms Designer Verification","BTC v12.6",true,COMPLETED,100,100,0,0,4

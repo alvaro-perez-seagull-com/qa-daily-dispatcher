@@ -1,0 +1,8 @@
+schemaVersion: "1.0"
+appName: "Seagull QA Daily Dispatcher"
+exportedAt: "2026-09-29T00:10:26.493Z"
+state:
+  introData:
+    featureName: "Intelligent Forms: Refreshable Print Preview"
+    epicKey: "BPLAT-20767"
+    productVersion: "BTC v12.6"

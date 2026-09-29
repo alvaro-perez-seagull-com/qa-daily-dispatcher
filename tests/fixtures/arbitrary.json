@@ -1,0 +1,8 @@
+{
+  "name": "daily-dispatcher-test",
+  "version": "1.0.0",
+  "description": "Arbitrary JSON document unrelated to Dispatcher",
+  "scripts": {
+    "test": "echo test"
+  }
+}

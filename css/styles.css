@@ -549,6 +549,11 @@ textarea.form-control {
   transform: translateY(0);
 }
 
+.toast.toast-error {
+  background: #b91c1c;
+  color: #ffffff;
+}
+
 /* Tooltip */
 .tooltip-wrapper {
   position: relative;

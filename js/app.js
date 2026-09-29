@@ -1454,21 +1454,80 @@ window.triggerImportSession = function() {
   }
 };
 
+// Validate imported JSON session structure against Dispatcher schema
+function validateSessionSchema(parsed) {
+  // Specifically detect tabular database / record array files (like DS1.json)
+  if (Array.isArray(parsed)) {
+    throw new Error("The selected file is a JSON Array (data source / record table), not a Daily Dispatcher session document. Session files must be a structured JSON document containing project state.");
+  }
+
+  if (!parsed || typeof parsed !== 'object') {
+    throw new Error("The selected file does not contain a valid JSON object structure.");
+  }
+
+  // Support either wrapped schema format ({ appName, state: { ... } }) or direct state object
+  const target = (parsed.state && typeof parsed.state === 'object' && !Array.isArray(parsed.state))
+    ? parsed.state
+    : parsed;
+
+  const hasAppName = parsed.appName === 'Seagull QA Daily Dispatcher';
+  const hasIntro = target.introData && typeof target.introData === 'object' && !Array.isArray(target.introData);
+  const hasCycles = Array.isArray(target.cycles);
+  const hasBugs = Array.isArray(target.bugs);
+
+  // Strict Dispatcher schema verification:
+  // Must have the official appName signature OR both introData and valid test cycles/bugs structures
+  const isDispatcherSchema = hasAppName || (hasIntro && (hasCycles || hasBugs));
+
+  if (!isDispatcherSchema) {
+    throw new Error("The file is a valid JSON document, but it does not match the Seagull QA Daily Dispatcher session schema (missing introData, test cycles, or bug records).");
+  }
+
+  // Type safety integrity checks on present sections
+  if (target.introData !== undefined && (typeof target.introData !== 'object' || Array.isArray(target.introData) || target.introData === null)) {
+    throw new Error("Invalid session schema: 'introData' section is malformed.");
+  }
+  if (target.cycles !== undefined && !Array.isArray(target.cycles)) {
+    throw new Error("Invalid session schema: 'cycles' section must be a list of test cycles.");
+  }
+  if (target.bugs !== undefined && !Array.isArray(target.bugs)) {
+    throw new Error("Invalid session schema: 'bugs' section must be a list of defect records.");
+  }
+  if (target.scorecardParams !== undefined && (typeof target.scorecardParams !== 'object' || Array.isArray(target.scorecardParams) || target.scorecardParams === null)) {
+    throw new Error("Invalid session schema: 'scorecardParams' section is malformed.");
+  }
+
+  return target;
+}
+
 // Handle file selected for importing session
 window.handleSessionFileSelected = function(event) {
   const file = event.target.files && event.target.files[0];
   if (!file) return;
 
+  // File extension restriction guard
+  const fileName = (file.name || '').toLowerCase();
+  if (!fileName.endsWith('.json')) {
+    const errorMsg = `Invalid file type "${file.name}". Only .json session files are supported.`;
+    console.error("Session import error:", errorMsg);
+    showToast(errorMsg, true);
+    alert(errorMsg);
+    event.target.value = '';
+    return;
+  }
+
   const reader = new FileReader();
   reader.onload = function(e) {
     try {
-      const parsed = JSON.parse(e.target.result);
-      // Support either wrapped schema format or raw state object
-      const importedState = parsed.state || parsed;
-
-      if (!importedState.introData && !importedState.cycles && !importedState.bugs) {
-        throw new Error("Invalid session file structure. Missing required dispatcher fields.");
+      let parsed;
+      try {
+        parsed = JSON.parse(e.target.result);
+      } catch (jsonErr) {
+        throw new Error(`Invalid JSON syntax: ${jsonErr.message}`);
       }
+
+      // Strict schema verification
+      const importedState = validateSessionSchema(parsed);
 
       // Merge into active state
       if (importedState.introData) state.introData = { ...state.introData, ...importedState.introData };
@@ -1492,19 +1551,41 @@ window.handleSessionFileSelected = function(event) {
       showToast(`Session loaded successfully from ${file.name}!`);
     } catch (err) {
       console.error("Session import error:", err);
-      alert(`Failed to import session file: ${err.message || 'Invalid JSON format'}`);
+      const errMsg = `Failed to import session: ${err.message || 'Invalid JSON format'}`;
+      showToast(errMsg, true);
+      alert(errMsg);
+    } finally {
+      // Clear file input value to allow re-selection of the same or corrected file
+      event.target.value = '';
     }
   };
+
+  reader.onerror = function(err) {
+    const errMsg = "Failed to read file from disk.";
+    console.error("FileReader error:", err);
+    showToast(errMsg, true);
+    alert(errMsg);
+    event.target.value = '';
+  };
+
   reader.readAsText(file);
 };
 
 // Toast Notification
-function showToast(message) {
+function showToast(message, isError = false) {
   const toast = document.getElementById('toast');
   if (toast) {
     toast.textContent = message;
+    if (isError) {
+      toast.classList.add('toast-error');
+    } else {
+      toast.classList.remove('toast-error');
+    }
     toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3500);
+    setTimeout(() => {
+      toast.classList.remove('show');
+      toast.classList.remove('toast-error');
+    }, 4000);
   }
 }
 

@@ -1,0 +1,202 @@
+[
+  {
+    "fieldDate": "2026-02-27",
+    "fieldTime": "14:30:00",
+    "fieldDecimal": 13.99,
+    "fieldFloat": 1599.2,
+    "fieldInt": 19901987,
+    "fieldText": "STXT01",
+    "fieldString": "Country 1",
+    "fieldBool": true
+  },
+  {
+    "fieldDate": "2026-02-28",
+    "fieldTime": "14:31:00",
+    "fieldDecimal": 14.99,
+    "fieldFloat": 1600.2,
+    "fieldInt": 19901988,
+    "fieldText": "STXT01",
+    "fieldString": "Country 1",
+    "fieldBool": true
+  },
+  {
+    "fieldDate": "2026-03-01",
+    "fieldTime": "14:32:00",
+    "fieldDecimal": 15.99,
+    "fieldFloat": 1601.2,
+    "fieldInt": 19901989,
+    "fieldText": "STXT01",
+    "fieldString": "Country 1",
+    "fieldBool": false
+  },
+  {
+    "fieldDate": "2026-03-02",
+    "fieldTime": "14:33:00",
+    "fieldDecimal": 16.99,
+    "fieldFloat": 1602.2,
+    "fieldInt": 19901990,
+    "fieldText": "STXT01",
+    "fieldString": "Country 1",
+    "fieldBool": true
+  },
+  {
+    "fieldDate": "2026-03-03",
+    "fieldTime": "14:34:00",
+    "fieldDecimal": 17.99,
+    "fieldFloat": 1603.2,
+    "fieldInt": 19901991,
+    "fieldText": "STXT01",
+    "fieldString": "Country 1",
+    "fieldBool": false
+  },
+  {
+    "fieldDate": "2026-03-04",
+    "fieldTime": "14:35:00",
+    "fieldDecimal": 18.99,
+    "fieldFloat": 1604.2,
+    "fieldInt": 19901992,
+    "fieldText": "STXT01",
+    "fieldString": "Country 1",
+    "fieldBool": true
+  },
+  {
+    "fieldDate": "2026-03-05",
+    "fieldTime": "14:36:00",
+    "fieldDecimal": 19.99,
+    "fieldFloat": 1605.2,
+    "fieldInt": 19901993,
+    "fieldText": "STXT01",
+    "fieldString": "Country 1",
+    "fieldBool": true
+  },
+  {
+    "fieldDate": "2026-03-06",
+    "fieldTime": "14:37:00",
+    "fieldDecimal": 20.99,
+    "fieldFloat": 1606.2,
+    "fieldInt": 19901994,
+    "fieldText": "STXT01",
+    "fieldString": "Country 1",
+    "fieldBool": false
+  },
+  {
+    "fieldDate": "2026-03-07",
+    "fieldTime": "14:38:00",
+    "fieldDecimal": 21.99,
+    "fieldFloat": 1607.2,
+    "fieldInt": 19901995,
+    "fieldText": "STXT01",
+    "fieldString": "Country 1",
+    "fieldBool": true
+  },
+  {
+    "fieldDate": "2026-03-08",
+    "fieldTime": "14:39:00",
+    "fieldDecimal": 22.99,
+    "fieldFloat": 1608.2,
+    "fieldInt": 19901996,
+    "fieldText": "STXT01",
+    "fieldString": "Country 1",
+    "fieldBool": false
+  },
+  {
+    "fieldDate": "2026-03-09",
+    "fieldTime": "14:40:00",
+    "fieldDecimal": 23.99,
+    "fieldFloat": 1609.2,
+    "fieldInt": 1001,
+    "fieldText": "STXT02",
+    "fieldString": "Country 2",
+    "fieldBool": true
+  },
+  {
+    "fieldDate": "2026-03-10",
+    "fieldTime": "14:41:00",
+    "fieldDecimal": 24.99,
+    "fieldFloat": 1610.2,
+    "fieldInt": 1002,
+    "fieldText": "STXT02",
+    "fieldString": "Country 2",
+    "fieldBool": false
+  },
+  {
+    "fieldDate": "2026-03-11",
+    "fieldTime": "14:42:00",
+    "fieldDecimal": 25.99,
+    "fieldFloat": 1611.2,
+    "fieldInt": 1003,
+    "fieldText": "STXT02",
+    "fieldString": "Country 2",
+    "fieldBool": true
+  },
+  {
+    "fieldDate": "2026-03-12",
+    "fieldTime": "14:43:00",
+    "fieldDecimal": 26.99,
+    "fieldFloat": 1612.2,
+    "fieldInt": 1004,
+    "fieldText": "STXT02",
+    "fieldString": "Country 2",
+    "fieldBool": true
+  },
+  {
+    "fieldDate": "2026-03-13",
+    "fieldTime": "14:44:00",
+    "fieldDecimal": 27.99,
+    "fieldFloat": 1613.2,
+    "fieldInt": 1005,
+    "fieldText": "STXT02",
+    "fieldString": "Country 2",
+    "fieldBool": false
+  },
+  {
+    "fieldDate": "2026-03-14",
+    "fieldTime": "14:45:00",
+    "fieldDecimal": 28.99,
+    "fieldFloat": 1614.2,
+    "fieldInt": 2001,
+    "fieldText": "STXT03",
+    "fieldString": "Country 3",
+    "fieldBool": true
+  },
+  {
+    "fieldDate": "2026-03-15",
+    "fieldTime": "14:46:00",
+    "fieldDecimal": 29.99,
+    "fieldFloat": 1615.2,
+    "fieldInt": 2002,
+    "fieldText": "STXT03",
+    "fieldString": "Country 3",
+    "fieldBool": false
+  },
+  {
+    "fieldDate": "2026-03-16",
+    "fieldTime": "14:47:00",
+    "fieldDecimal": 30.99,
+    "fieldFloat": 1616.2,
+    "fieldInt": 2003,
+    "fieldText": "STXT03",
+    "fieldString": "Country 3",
+    "fieldBool": true
+  },
+  {
+    "fieldDate": "2026-03-17",
+    "fieldTime": "14:48:00",
+    "fieldDecimal": 31.99,
+    "fieldFloat": 1617.2,
+    "fieldInt": 2004,
+    "fieldText": "STXT03",
+    "fieldString": "Country 3",
+    "fieldBool": true
+  },
+  {
+    "fieldDate": "2026-03-18",
+    "fieldTime": "14:49:00",
+    "fieldDecimal": 32.99,
+    "fieldFloat": 1618.2,
+    "fieldInt": 2005,
+    "fieldText": "STXT03",
+    "fieldString": "Country 3",
+    "fieldBool": false
+  }
+]

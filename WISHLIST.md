@@ -122,15 +122,18 @@ This document tracks prospective feature requests, UX enhancements, and architec
 
 ---
 
-### 10. Strict Session JSON Import Validation & Label Cleanup (`💡 Idea / In Discussion`)
-* **Problem Statement:** Currently, the import button is labeled `Import Session (.json)`. The file picker does not strictly restrict uploads to JSON documents, and the importer accepts any valid JSON structure, risking application state corruption or runtime crashes if an incompatible JSON file is selected.
-* **Proposed Scope:**
-  * **Button Label Cleanup:** Change `Import Session (.json)` to simply `Import Session`.
-  * **File Picker Restriction:** Constrain `<input type="file">` to `accept=".json,application/json"` so the OS file dialog strictly permits `.json` documents.
-  * **Strict Schema Validation:**
-    - Validate the imported JSON document against the Dispatcher export schema before committing to application state.
-    - Check for required schema markers (e.g., `appName === 'Seagull QA Daily Dispatcher'`, valid `schemaVersion`, or presence of required state sections: `introData`, `cycles`, `bugs`, `scorecardParams`).
-    - If the uploaded file fails schema verification, reject the import cleanly with a descriptive error message/toast (e.g., *"Invalid Session File: The selected JSON document does not match the Seagull QA Daily Dispatcher schema"*), preserving current session data without corruption.
+### 10. Strict Session JSON Import Validation & Label Cleanup (`✅ Completed / Released`)
+* **Problem Statement:** Previously, the file picker did not strictly restrict uploads to JSON documents, and the importer accepted any valid JSON structure, risking application state corruption or runtime crashes if an incompatible JSON file was selected.
+* **Delivered Solution:**
+  * **Clean Button Label:** Harmonized import button label to **"Import Session"** across UI and accessible tooltips.
+  * **Strict OS-Level File Picker Filter:** Configured `<input type="file" id="session-file-input">` with `accept=".json,application/json"`.
+  * **Client-Side Extension & MIME Guard:** Added instant check in `handleSessionFileSelected` verifying `file.name.toLowerCase().endsWith('.json')`, rejecting non-JSON documents (e.g., YAML, CSV, TXT) before file parsing.
+  * **Strict Schema Verification Engine (`validateSessionSchema`):**
+    - Verifies root document is a non-null JSON object.
+    - Enforces Seagull QA Daily Dispatcher signature (`appName === 'Seagull QA Daily Dispatcher'`) or full valid structural markers (`introData`, `cycles` array, `bugs` array).
+    - Rejects incompatible or arbitrary JSON payloads (e.g., `package.json`, cloud configs, raw API responses) cleanly without touching active application state.
+  * **Safe Error Feedback & State Rollback:** Surfaces descriptive error messages in a styled red error toast (`.toast.toast-error`) and alert dialog, keeping active state 100% intact upon rejection.
+  * **Immediate Re-selection Ergonomics:** Resets file input value (`event.target.value = ''`) upon completion or rejection, permitting instant re-selection of the same or corrected file without page reloads.
 
 ---
 

@@ -1,0 +1,117 @@
+{
+  "schemaVersion": "1.0",
+  "appName": "Seagull QA Daily Dispatcher",
+  "exportedAt": "2026-09-29T00:10:26.493Z",
+  "state": {
+    "introData": {
+      "senderName": "Alvaro Perez",
+      "senderEmail": "aperez@seagullsoftware.com",
+      "sentDate": "2026-09-25T22:05:23.934Z",
+      "toRecipients": [],
+      "ccRecipients": [],
+      "productVersion": "BTC v12.6",
+      "ideaKey": "IDEA-3110",
+      "epicKey": "BPLAT-20767",
+      "featureName": "Intelligent Forms: Refreshable Print Preview",
+      "executionStartDate": "09/22/2026"
+    },
+    "cycles": [
+      {
+        "area": "BPLAT-R925: Dev Quality Gate Testing",
+        "cycleKey": "BPLAT-R925",
+        "cycleUrl": "https://mojixinc.atlassian.net/projects/BPLAT?selectedItem=com.atlassian.plugins.atlassian-connect-plugin:com.kanoah.test-manager__main-project-page#!/v2/testCycle/BPLAT-R925",
+        "productVersion": "BTC v12.6",
+        "readyToTest": true,
+        "testingStatus": "COMPLETED",
+        "progress": 100,
+        "passed": 100,
+        "retest": 0,
+        "issues": 0,
+        "testCases": 6
+      },
+      {
+        "area": "BPLAT-R926: QA Functional & Integration Testing",
+        "cycleKey": "BPLAT-R926",
+        "cycleUrl": "https://mojixinc.atlassian.net/projects/BPLAT?selectedItem=com.atlassian.plugins.atlassian-connect-plugin:com.kanoah.test-manager__main-project-page#!/v2/testCycle/BPLAT-R926",
+        "productVersion": "BTC v12.6",
+        "readyToTest": true,
+        "testingStatus": "COMPLETED",
+        "progress": 100,
+        "passed": 100,
+        "retest": 0,
+        "issues": 2,
+        "testCases": 20
+      },
+      {
+        "area": "BPLAT-R927: QA Localization Testing",
+        "cycleKey": "BPLAT-R927",
+        "cycleUrl": "https://mojixinc.atlassian.net/projects/BPLAT?selectedItem=com.atlassian.plugins.atlassian-connect-plugin:com.kanoah.test-manager__main-project-page#!/v2/testCycle/BPLAT-R927",
+        "productVersion": "BTC v12.6",
+        "readyToTest": true,
+        "testingStatus": "BLOCKED",
+        "progress": 50,
+        "passed": 50,
+        "retest": 0,
+        "issues": 0,
+        "testCases": 2
+      },
+      {
+        "area": "BPLAT-R935: QA Critical Path Testing",
+        "cycleKey": "BPLAT-R935",
+        "cycleUrl": "https://mojixinc.atlassian.net/projects/BPLAT?selectedItem=com.atlassian.plugins.atlassian-connect-plugin:com.kanoah.test-manager__main-project-page#!/v2/testCycle/BPLAT-R935",
+        "productVersion": "BTC v12.6",
+        "readyToTest": true,
+        "testingStatus": "COMPLETED",
+        "progress": 100,
+        "passed": 100,
+        "retest": 0,
+        "issues": 0,
+        "testCases": 6
+      }
+    ],
+    "bugs": [
+      {
+        "type": "Bug",
+        "key": "BPLAT-23199",
+        "url": "https://mojixinc.atlassian.net/browse/BPLAT-23199",
+        "summary": "Forms: Mapping of same Form Components to multiple Label Variables is not working on Preview",
+        "dateCreated": "2026-09-22T21:23:00",
+        "severity": "SEV 4 (Medium)",
+        "status": "Resolved",
+        "reopened": 0,
+        "age": 0.8
+      },
+      {
+        "type": "Bug",
+        "key": "BPLAT-23335",
+        "url": "https://mojixinc.atlassian.net/browse/BPLAT-23335",
+        "summary": "Forms: Mapping of components/variables only works on 1st linked label when printing BTW via Runtime",
+        "dateCreated": "2026-09-24T21:23:00",
+        "severity": "SEV 4 (Medium)",
+        "status": "Resolved",
+        "reopened": 0,
+        "age": 0.8
+      }
+    ],
+    "links": {
+      "ideaKey": "IDEA-3110",
+      "epicKey": "BPLAT-20767",
+      "filterUrl": "https://mojixinc.atlassian.net/issues?filter=26711&jql=type%20IN%20(Improvement%2C%20Bug)%20and%20Project%20%3D%20%22Bartender%20Platform%22%20and%20labels%20IN%20(BPLAT-20767)%20and%20status%20!%3D%20Invalid%20AND%20affectedVersion%20%3D%20%22BTC%20v12.6%22%0AORDER%20BY%20%22cf%5B10700%5D%22%20ASC%2C%20fixVersion%20DESC%2C%20created%20ASC",
+      "ideaUrl": "https://mojixinc.atlassian.net/browse/IDEA-3110",
+      "epicUrl": "https://mojixinc.atlassian.net/browse/BPLAT-20767"
+    },
+    "scorecardParams": {
+      "storyPoints": 34.5,
+      "reopened": 0,
+      "closed": 0,
+      "escaped": {
+        "s1": 0,
+        "s2": 0,
+        "s3": 0,
+        "s4": 0,
+        "s5": 0
+      }
+    },
+    "referenceDate": "2026-09-29T00:10:26.493Z"
+  }
+}
