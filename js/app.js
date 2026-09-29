@@ -503,8 +503,14 @@ function updateFilterUrl() {
   const copyBtn = document.getElementById('btn-copy-filter-url');
   const openBtn = document.getElementById('btn-open-filter-url');
   const hasUrl = Boolean(generatedUrl);
-  if (copyBtn) copyBtn.disabled = !hasUrl;
-  if (openBtn) openBtn.disabled = !hasUrl;
+  if (copyBtn) {
+    copyBtn.disabled = !hasUrl;
+    copyBtn.toggleAttribute('disabled', !hasUrl);
+  }
+  if (openBtn) {
+    openBtn.disabled = !hasUrl;
+    openBtn.toggleAttribute('disabled', !hasUrl);
+  }
 }
 
 window.copyFilterUrl = async function() {

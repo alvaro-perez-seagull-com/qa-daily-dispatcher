@@ -296,7 +296,9 @@ textarea.form-control {
   position: relative;
 }
 
-.btn-input-action {
+.btn-input-action,
+.input-action-group .btn.btn-secondary.btn-icon,
+.date-picker-group .btn.btn-secondary.btn-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -304,31 +306,38 @@ textarea.form-control {
   height: 36px;
   min-width: 36px;
   padding: 0;
-  border: 1px solid var(--border);
+  border: 1px solid var(--accent-blue);
   border-radius: 6px;
-  background: #ffffff;
-  color: var(--text-main);
+  background: var(--accent-blue);
+  color: #ffffff;
   cursor: pointer;
   transition: all 0.15s ease;
   flex-shrink: 0;
 }
 
-.btn-input-action:hover:not(:disabled) {
-  background: #f0f9ff;
+.btn-input-action:hover:not(:disabled),
+.input-action-group .btn.btn-secondary.btn-icon:hover:not(:disabled),
+.date-picker-group .btn.btn-secondary.btn-icon:hover:not(:disabled) {
+  background: var(--accent-cyan);
   border-color: var(--accent-cyan);
-  color: var(--accent-cyan);
+  color: #ffffff;
 }
 
-.btn-input-action:active:not(:disabled) {
+.btn-input-action:active:not(:disabled),
+.input-action-group .btn.btn-secondary.btn-icon:active:not(:disabled),
+.date-picker-group .btn.btn-secondary.btn-icon:active:not(:disabled) {
   transform: translateY(1px);
 }
 
-.btn-input-action:disabled {
+.btn-input-action:disabled,
+.input-action-group .btn.btn-secondary.btn-icon:disabled,
+.date-picker-group .btn.btn-secondary.btn-icon:disabled {
   opacity: 0.45;
   cursor: not-allowed;
-  background: var(--bg-subtle);
-  border-color: var(--border);
-  color: var(--text-muted);
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+  color: #ffffff;
+  pointer-events: none;
 }
 
 .field-error-msg {
@@ -637,7 +646,7 @@ textarea.form-control {
 }
 
 /* Button States & Variants */
-.btn:disabled, .btn[disabled] {
+.btn:disabled {
   opacity: 0.45;
   cursor: not-allowed;
   box-shadow: none;

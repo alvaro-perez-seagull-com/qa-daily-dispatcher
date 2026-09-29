@@ -93,11 +93,11 @@ This document tracks prospective feature requests, UX enhancements, and architec
 
 ---
 
-### 8. Project Setup Action Buttons: Visual Harmonization (`💡 Idea / In Discussion`)
-* **Problem Statement:** In Tab 1 (Project Setup), the calendar date picker icon button, copy-to-clipboard button, and open Jira filter tab button currently utilize `.btn-input-action` (outline style), which looks visually inconsistent with the polished, solid action buttons in Tab 4 (Live Email Preview).
-* **Proposed Scope:**
-  * Harmonize the action buttons in Tab 1 (`#btnDatePicker`, `#btnCopyJiraUrl`, `#btnOpenJiraUrl`) with the button styling used in Tab 4 (`.btn.btn-secondary.btn-icon`).
-  * Ensure consistent Seagull deep blue fill (`#185FA5`), BarTender cerulean cyan hover state (`#068FBE`), crisp SVG icon sizing, and smooth active/disabled transitions across both tabs.
+### 8. Project Setup Action Buttons: Visual Harmonization (`✅ Completed / Released`)
+* **Problem Statement:** In Tab 1 (Project Setup), the calendar date picker icon button, copy-to-clipboard button, and open Jira filter tab button previously utilized `.btn-input-action` (outline style), which looked visually inconsistent with the polished, solid action buttons in Tab 4 (Live Email Preview).
+* **Delivered Solution:**
+  * Harmonized the action buttons in Tab 1 (`#btn-date-picker`, `#btn-copy-filter-url`, `#btn-open-filter-url`) with the solid blue button design system used in Tab 4 (`.btn.btn-secondary.btn-icon`).
+  * Enforced consistent Seagull deep blue fill (`#185FA5`), BarTender cerulean cyan hover state (`#068FBE`), crisp SVG icon sizing, and smooth active/disabled transitions across all tabs.
 
 ---
 
