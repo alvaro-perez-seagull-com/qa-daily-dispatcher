@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Seagull QA Daily Dispatcher</title>
-  <link rel="stylesheet" href="css/styles.css?v=33">
+  <link rel="stylesheet" href="css/styles.css?v=38">
 </head>
 <body>
   <div class="app-container">
@@ -62,7 +62,7 @@
               <div class="input-action-group date-picker-group">
                 <input type="text" id="input-start-date" class="form-control" placeholder="MM/DD/YYYY" maxlength="10" oninput="handleDateInput(this)" onblur="handleDateBlur(this)" onkeydown="handleDateKeyDown(event)">
                 <input type="date" id="native-date-picker" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0" tabindex="-1" onchange="handleNativeDateSelect(this.value)">
-                <button type="button" class="btn-input-action" onclick="openNativeDatePicker()" title="Select date from calendar" aria-label="Open Calendar">
+                <button type="button" id="btn-date-picker" class="btn btn-secondary btn-icon" onclick="openNativeDatePicker()" title="Select date from calendar" aria-label="Open Calendar">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                     <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -96,13 +96,13 @@
             <label>JIRA - List of Bugs Filter URL</label>
             <div class="input-action-group">
               <input type="text" id="input-filter-url" class="form-control" readonly placeholder="Auto-generated based on Jira Key..." style="background:var(--bg-subtle);cursor:default">
-              <button type="button" id="btn-copy-filter-url" class="btn-input-action" onclick="copyFilterUrl()" title="Copy Filter URL to Clipboard" aria-label="Copy Filter URL" disabled>
+              <button type="button" id="btn-copy-filter-url" class="btn btn-secondary btn-icon" onclick="copyFilterUrl()" title="Copy Filter URL to Clipboard" aria-label="Copy Filter URL" disabled>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                   <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                 </svg>
               </button>
-              <button type="button" id="btn-open-filter-url" class="btn-input-action" onclick="openFilterUrlFromSetup()" title="Open Filter in Jira ↗" aria-label="Open Filter in Jira" disabled>
+              <button type="button" id="btn-open-filter-url" class="btn btn-secondary btn-icon" onclick="openFilterUrlFromSetup()" title="Open Filter in Jira ↗" aria-label="Open Filter in Jira" disabled>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                   <polyline points="15 3 21 3 21 9"></polyline>
@@ -151,11 +151,11 @@
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
             Reset Form
           </button>
-          <button type="button" class="btn btn-secondary" onclick="triggerImportSession()" title="Import a previously exported JSON session file">
+          <label for="session-file-input" class="btn btn-secondary" title="Import a previously exported JSON session file" style="cursor:pointer;margin:0;display:inline-flex;align-items:center">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            Import Session (.json)
-          </button>
-          <input type="file" id="session-file-input" accept=".json,application/json" style="display:none" onchange="handleSessionFileSelected(event)">
+            Import Session
+          </label>
+          <input type="file" id="session-file-input" accept=".json,application/json" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0" onchange="handleSessionFileSelected(event)">
         </div>
         <button type="button" id="btn-continue-cycles" class="btn btn-primary" onclick="proceedToCycles()" disabled>
           Continue to Cycles &rarr;
@@ -268,6 +268,29 @@
         <p style="font-size:13px;color:var(--text-muted);margin:0">
           Inspect formatting below before copying. All Word 15 MSO styles, tables, and images are rendered live.
         </p>
+      </div>
+
+      <!-- Stale Session Date Warning Banner -->
+      <div id="preview-stale-date-banner" class="stale-date-banner" style="display:none">
+        <div style="display:flex;align-items:center;gap:10px">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          <div>
+            <span style="font-weight:700;color:#991b1b">Outdated Session Date:</span>
+            <span style="color:#7f1d1d;margin-left:4px">
+              The subject line contains a past session date (<strong id="stale-date-recorded">09-25-2026</strong>). Click <strong>Refresh Preview</strong> to update to today's date (<strong id="stale-date-today">09-28-2026</strong>).
+            </span>
+          </div>
+        </div>
+        <button type="button" class="btn btn-sm btn-danger" onclick="refreshPreviewManually()" style="font-size:11.5px;padding:5px 12px;white-space:nowrap;display:inline-flex;align-items:center;gap:5px;flex-shrink:0">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+          </svg>
+          <span>Update to Today</span>
+        </button>
       </div>
 
       <!-- 2. Subject line in read-only field plus clipboard icon (no label) -->
@@ -428,6 +451,6 @@
   <div id="toast" class="toast"></div>
 
   <!-- ES Module Application Entrypoint -->
-  <script type="module" src="js/app.js?v=33"></script>
+  <script type="module" src="js/app.js?v=38"></script>
 </body>
 </html>

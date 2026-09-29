@@ -46,6 +46,27 @@ qa-daily-dispatcher/
 
 ## Release History & Changelog
 
+### `0.0.10` — Stale Date Warning UI, Test Cycle READY State & Setup Action Button Harmonization
+- **Stale Session Date Warning Banner & 1-Click Refresh:**
+  - Auto-detects outdated session dates on session import (`importedDate !== today`).
+  - Displays a high-visibility warning banner in Tab 4 (`#preview-stale-date-banner`) and outlines the subject input in warning red (`.subject-stale-warning`).
+  - Added a 1-click **"Refresh Preview"** action button that automatically updates the session date to today's local date, regenerates subject lines and message headers, dismisses the warning banner, and persists the state.
+  - Normalized ISO string deserialization in `SectionBugsList.calculateAge()` to prevent `referenceDate.getTime is not a function` runtime errors when loading serialized dates.
+- **Native OS File Dialog Activation:**
+  - Replaced JavaScript-mediated button clicks on hidden file inputs with a semantic `<label for="session-file-input" class="btn btn-secondary">` and an off-screen clipped file input (`width: 0.1px`, `height: 0.1px`, `opacity: 0`).
+  - Guarantees immediate, native OS file chooser activation across all desktop browsers (Chrome, Safari, Firefox, Edge).
+- **Test Cycles 'READY' Testing Status:**
+  - Added `READY` as a first-class status option in Tab 2's Test Cycles Summary table dropdown.
+  - Automatically renders centered `READY` status text in the generated Outlook MSO HTML summary table.
+- **Project Setup Action Buttons Visual Harmonization:**
+  - Harmonized Tab 1 action buttons (`#btn-date-picker`, `#btn-copy-filter-url`, `#btn-open-filter-url`) with Tab 4's solid blue button design system (`.btn.btn-secondary.btn-icon`).
+  - Standardized on Seagull deep blue fill (`#185FA5`), BarTender cerulean cyan hover (`#068FBE`), 36x36px square footprint, and crisp white SVG icons.
+  - Synchronized `:disabled` states with `opacity: 0.45` and `pointer-events: none` using standard CSS `:disabled` pseudo-class and `toggleAttribute('disabled')`.
+- **Local Testing Sandbox & Ignore Protocol:**
+  - Added `.gitignore` to strictly exclude the local `testing/` workspace folder from git commits.
+- **Asset Cache-Busting:**
+  - Bumped script and stylesheet query parameters to `?v=38` for immediate cache invalidation.
+
 ### `0.0.9` — Local Timezone Subject Line Formatting & Session Deserialization
 - **Local Browser Timezone Subject Formatting:** Replaced UTC-dependent `new Date().toISOString().split('T')[0]` with `SectionIntro.getLocalIsoDate(data?.sentDate)`. This prevents evening date rollover past 5:00 PM in Western/Pacific timezones (UTC-7) and guarantees that generated subject lines always match the engineer's active calendar day.
 - **Wrapped Session State Deserialization:** Enhanced `loadSavedState()` in `app.js` with `if (parsed.state) parsed = parsed.state` to seamlessly parse both raw state and schema-wrapped session JSON files upon page reload.

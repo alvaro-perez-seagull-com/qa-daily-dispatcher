@@ -1,12 +1,12 @@
-import { SectionIntro } from './section-intro.js?v=33';
-import { SectionSummary } from './section-summary.js?v=33';
-import { SectionScorecard } from './section-scorecard.js?v=33';
-import { SectionBugsChart } from './section-bugs-chart.js?v=33';
-import { SectionBugsList } from './section-bugs-list.js?v=33';
-import { SectionLinks } from './section-links.js?v=33';
-import { TemplateMso } from './template-mso.js?v=33';
-import { ClipboardHelper } from './clipboard.js?v=33';
-import { JiraImporter } from './jira-importer.js?v=33';
+import { SectionIntro } from './section-intro.js?v=35';
+import { SectionSummary } from './section-summary.js?v=35';
+import { SectionScorecard } from './section-scorecard.js?v=35';
+import { SectionBugsChart } from './section-bugs-chart.js?v=35';
+import { SectionBugsList } from './section-bugs-list.js?v=35';
+import { SectionLinks } from './section-links.js?v=35';
+import { TemplateMso } from './template-mso.js?v=35';
+import { ClipboardHelper } from './clipboard.js?v=35';
+import { JiraImporter } from './jira-importer.js?v=35';
 
 const STORAGE_KEY = 'seagull_dispatcher_v1';
 
@@ -503,8 +503,14 @@ function updateFilterUrl() {
   const copyBtn = document.getElementById('btn-copy-filter-url');
   const openBtn = document.getElementById('btn-open-filter-url');
   const hasUrl = Boolean(generatedUrl);
-  if (copyBtn) copyBtn.disabled = !hasUrl;
-  if (openBtn) openBtn.disabled = !hasUrl;
+  if (copyBtn) {
+    copyBtn.disabled = !hasUrl;
+    copyBtn.toggleAttribute('disabled', !hasUrl);
+  }
+  if (openBtn) {
+    openBtn.disabled = !hasUrl;
+    openBtn.toggleAttribute('disabled', !hasUrl);
+  }
 }
 
 window.copyFilterUrl = async function() {
@@ -1041,6 +1047,7 @@ function renderCyclesTable() {
         </td>
         <td>
           <select class="form-control" onchange="updateCycle(${idx}, 'testingStatus', this.value)">
+            <option value="READY" ${c.testingStatus === 'READY' || c.testingStatus === 'Ready' ? 'selected' : ''}>READY</option>
             <option value="IN PROGRESS" ${c.testingStatus === 'IN PROGRESS' ? 'selected' : ''}>IN PROGRESS</option>
             <option value="COMPLETED" ${c.testingStatus === 'COMPLETED' ? 'selected' : ''}>COMPLETED</option>
             <option value="BLOCKED" ${c.testingStatus === 'BLOCKED' ? 'selected' : ''}>BLOCKED</option>
@@ -1358,6 +1365,28 @@ function renderPreview() {
   if (subjectInput) {
     subjectInput.value = subject;
   }
+
+  // Check for outdated session date vs today's date
+  const recordedDateIso = SectionIntro.getLocalIsoDate(state.introData.sentDate);
+  const todayIso = SectionIntro.getLocalIsoDate(new Date());
+  const isStale = Boolean(recordedDateIso && todayIso && recordedDateIso !== todayIso);
+
+  const banner = document.getElementById('preview-stale-date-banner');
+  const recordedSpan = document.getElementById('stale-date-recorded');
+  const todaySpan = document.getElementById('stale-date-today');
+
+  if (banner) {
+    if (isStale) {
+      if (recordedSpan) recordedSpan.textContent = recordedDateIso;
+      if (todaySpan) todaySpan.textContent = todayIso;
+      banner.style.display = 'flex';
+      subjectInput?.classList.add('subject-stale-warning');
+    } else {
+      banner.style.display = 'none';
+      subjectInput?.classList.remove('subject-stale-warning');
+    }
+  }
+
   const html = TemplateMso.assembleEmailHtml(state);
   const previewContainer = document.getElementById('email-preview-frame');
   if (previewContainer) {
@@ -1367,14 +1396,21 @@ function renderPreview() {
 window.renderPreview = renderPreview;
 
 window.refreshPreviewManually = function() {
+  state.introData.sentDate = new Date();
+  state.referenceDate = new Date();
+  saveState();
   renderPreview();
   renderLiveStats();
-  showToast('Live Email Preview refreshed!');
+  const todayIso = SectionIntro.getLocalIsoDate(state.introData.sentDate);
+  showToast(`Live Email Preview refreshed & date updated to today (${todayIso})!`);
 };
 
 // Export Session State to Downloadable JSON File
 window.exportSessionJson = function() {
   syncInputsToState();
+  if (!state.introData.sentDate) {
+    state.introData.sentDate = new Date();
+  }
   const sessionData = {
     schemaVersion: "1.0",
     appName: "Seagull QA Daily Dispatcher",

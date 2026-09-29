@@ -1,0 +1,7 @@
+# Ignore testing directory
+testing/
+
+# OS & Editor files
+.DS_Store
+Thumbs.db
+*.log
