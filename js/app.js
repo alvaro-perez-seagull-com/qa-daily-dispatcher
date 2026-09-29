@@ -1041,6 +1041,7 @@ function renderCyclesTable() {
         </td>
         <td>
           <select class="form-control" onchange="updateCycle(${idx}, 'testingStatus', this.value)">
+            <option value="READY" ${c.testingStatus === 'READY' || c.testingStatus === 'Ready' ? 'selected' : ''}>READY</option>
             <option value="IN PROGRESS" ${c.testingStatus === 'IN PROGRESS' ? 'selected' : ''}>IN PROGRESS</option>
             <option value="COMPLETED" ${c.testingStatus === 'COMPLETED' ? 'selected' : ''}>COMPLETED</option>
             <option value="BLOCKED" ${c.testingStatus === 'BLOCKED' ? 'selected' : ''}>BLOCKED</option>

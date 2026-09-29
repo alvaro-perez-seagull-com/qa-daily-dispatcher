@@ -57,11 +57,11 @@ This document tracks prospective feature requests, UX enhancements, and architec
 
 ---
 
-### 5. Testing Status: Add 'Ready' State (`💡 Idea / In Discussion`)
-* **Problem Statement:** In Tab 2 (Test Cycles Summary Table), newly provisioned or staged test cycles that are ready for QA execution but have not yet actively started are currently forced into `-` or `IN PROGRESS`.
-* **Proposed Scope:**
-  * Add `'Ready'` (or `'READY'`) as a selectable option in the **Testing Status** dropdown across UI rows and MSO email rendering.
-  * Ensures alignment with standard QA test cycle lifecycle states: `Ready` &rarr; `IN PROGRESS` &rarr; `COMPLETED` / `BLOCKED`.
+### 5. Testing Status: Add 'Ready' State (`✅ Completed / Released`)
+* **Problem Statement:** In Tab 2 (Test Cycles Summary Table), newly provisioned or staged test cycles that are ready for QA execution but have not yet actively started were forced into `-` or `IN PROGRESS`.
+* **Delivered Scope:**
+  * Added `'READY'` as a selectable option in the **Testing Status** dropdown across UI rows and MSO email rendering.
+  * Ensures alignment with standard QA test cycle lifecycle states: `READY` &rarr; `IN PROGRESS` &rarr; `COMPLETED` / `BLOCKED`.
 
 ---
 
