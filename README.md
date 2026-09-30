@@ -1,6 +1,6 @@
 # Seagull QA Daily Dispatcher
 
-A client-side web application designed for Seagull Software QA teams to automate the generation and copying of rigid, Microsoft Outlook / Word-compliant daily status emails for BarTender Cloud and OnPrem initiatives.
+A client-side web application designed for Seagull Software QA teams to automate the generation and copying of rigid, Microsoft Outlook / Word-compliant daily status emails across engineering initiatives.
 
 ---
 
