@@ -59,8 +59,9 @@ This document tracks prospective feature requests, UX enhancements, and architec
 
 ---
 
-### 4. Spanish Localization (Bolivia QA Team Support) (`💡 Idea / In Discussion`)
-* **Problem Statement:** Ensure QA team members in the Cochabamba, Bolivia office can comfortably navigate and operate the daily dispatch tool in their native Spanish language.
+### 4. Spanish Multi-Locale Localization (`📐 Shelved in Branch: feature/spanish-localization`)
+* **Problem Statement:** Ensure QA team members across regional engineering hubs (including Cochabamba, Bolivia and Latin America) can comfortably navigate and operate the daily dispatch tool in their native Spanish language.
+* **Status Note:** Fully implemented, verified via Playwright, and shelved in feature branch `feature/spanish-localization` for future rollout.
 * **Proposed Scope:**
   * **UI Language Toggle:** Simple header toggle (`🇺🇸 EN` | `🇧🇴 ES`) in the top navigation bar.
   * **I18n Translation Dictionary (`js/i18n.js`):** Modular JSON dictionary mapping all UI strings (labels, placeholders, tooltips, validation messages, toast notifications, and modal dialogs).
