@@ -202,8 +202,10 @@ This document tracks prospective feature requests, UX enhancements, and architec
 ---
 
 ### 20. Test Cycle `# ReTest` Average Calculation & Mandatory Validation Gate (`💡 Idea / Planned for Tomorrow`)
-* **Problem Statement:** The `# ReTest` summary column does not currently compute the arithmetic average across cycles, and unpopulated retest fields can distort downstream scorecard calculations.
+* **Domain Specification:** Each cycle's `# ReTest` input represents the highest retest count among individual test cases in that specific cycle (e.g. if test-01 was retested 30 times and test-02 4 times, the engineer enters `30`). Currently, the summary table incorrectly sums these values (`1 + 2 + 4 + 1 = 8`).
 * **Proposed Scope:**
-  * **Average Calculation:** Compute the arithmetic average of `# ReTest` values across all configured test cycles in the Total summary row (e.g. `1, 1, 1, 1` = `1`).
-  * **Unpopulated Red Warning:** If any cycle row has a blank `# ReTest` input, render `-` in bold warning red (`#dc2626`) in the Total summary row.
+  * **Average Summary Calculation:** Update the Total summary row for `# ReTest` to compute the arithmetic average across all configured test cycles (`Average = Sum of Cycle Max ReTests / Total Active Cycles`).
+    - *Example 1:* Cycles with values `1, 2, 4, 1` &rarr; Average = `(1 + 2 + 4 + 1) / 4` = **`2`**.
+    - *Example 2:* Cycles with values `30, 4, 1` &rarr; Average = `(30 + 4 + 1) / 3` = **`11.7`** (formatted to 1 decimal place if fractional).
+  * **Unpopulated Red Warning:** If any active cycle row has a blank `# ReTest` input, render `-` in bold warning red (`#dc2626`) in the Total summary row.
   * **Mandatory Field Gate:** Enforce `# ReTest` as a mandatory numeric field (`≥ 0`) in the "Continue to Bugs &rarr;" navigation gate, preventing navigation to downstream tabs until all cycles have valid retest counts.
