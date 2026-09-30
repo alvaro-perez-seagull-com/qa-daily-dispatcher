@@ -6,6 +6,35 @@ This document contains the complete historical log of all releases, architectura
 
 ## Release History
 
+### `0.0.12` — Spanish Multi-Locale Localization (`en`, `es-MX`, `es-BO`) & Tab 4 Email Language Toggle
+- **Multi-Locale Spanish Support (`en`, `es-MX`, `es-BO`):**
+  - Added header language selector dropdown (`🇺🇸 EN`, `🇲🇽 ES-MX`, `🇧🇴 ES-BO`) positioned adjacent to the application title with custom SVG chevron.
+  - Implemented modular translation engine (`js/i18n.js`) with comprehensive dictionary mappings across navigation tabs, form cards, field labels, placeholders, tooltips, validation messages, toast notifications, table headers, and modal dialogs.
+  - Accommodated regional Latin American QA nuances:
+    - Mexico (`es-MX`): *"Nombre de la iniciativa de funcionalidad"*, *"Restablecer formulario"*, *"Estimado equipo,"*.
+    - Bolivia (`es-BO`): *"Nombre del módulo / iniciativa"*, *"Reiniciar formulario"*, *"Saludos cordiales equipo,"*, *"Nº Defectos"*.
+- **In-Place Reactive DOM Translation (Zero Data Loss):**
+  - Translates text content, placeholders, and tooltips in-place without re-rendering or resetting form inputs, preserving typed values, cursor focus, and unsaved state.
+  - Automatically saves language preference to `localStorage` (`seagull_qa_lang`) and infers preferred dialect via `navigator.language` on first visit.
+- **Tab 4 Email Language Toggle (`EN` | `ES`):**
+  - Generated Outlook emails remain standard English by default for corporate distribution.
+  - Added on-demand email toggle pill (`[ Email Language: 🇺🇸 EN | 🇪🇸 ES ]`) inside Tab 4's preview toolbar.
+  - When switched to `ES`, translates email greetings (`Hola a todos,`), placeholder text, section headings (`Resumen de ciclos de prueba`, `Puntuación de calidad`, `Defectos por severidad`, `Lista de defectos encontrados`, `Enlaces rápidos`), and table column headers.
+  - **Subject Line Date Lockdown:** Strictly enforces that the email subject line date format remains locked to `YYYY-MM-DD` (e.g., `BTC v12.6: [IDEA-3110] - BPLAT-20767 - Feature Name - Daily Status - YYYY-MM-DD`).
+- **Comprehensive Automated Playwright Test Suite:**
+  - Added `tests/test-localization.mjs` verifying 100% dictionary coverage, zero input data loss, browser reload persistence, and subject date integrity.
+
+### `0.0.11` — Defect Chart Subtitle, Tab 4 Back Navigation & Strict JSON Import Validation
+- **Defect Distribution Chart Subtitle (Wishlist Item 12):**
+  - Replaced misleading percentage subtitle with accurate total defect count (e.g. *"Total Defects: 2"*).
+- **Tab 4 "← Back to Bugs" Navigation Button (Wishlist Item 9):**
+  - Added back button on the bottom left of Tab 4 to streamline navigation back to the bug list before copying.
+- **Strict Session JSON Import Validation (Wishlist Item 10):**
+  - Client-side extension/MIME guard blocking non-JSON (`.yaml`, `.csv`, `.txt`) before FileReader.
+  - `validateSessionSchema()` checking root object and Dispatcher markers with explicit diagnosis distinguishing JSON arrays from session objects.
+- **Header Score Gauge Optimization:**
+  - Expanded gauge diameter to 52px with 7.5px bold font to prevent status text clipping in Safari/WebKit.
+
 ### `0.0.10` — Stale Date Warning UI, Test Cycle READY State & Setup Action Button Harmonization
 - **Stale Session Date Warning Banner & 1-Click Refresh:**
   - Auto-detects outdated session dates on session import (`importedDate !== today`).

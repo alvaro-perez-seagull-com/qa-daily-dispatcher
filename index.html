@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Seagull QA Daily Dispatcher</title>
-  <link rel="stylesheet" href="css/styles.css?v=42">
+  <link rel="stylesheet" href="css/styles.css?v=44">
 </head>
 <body>
   <div class="app-container">
@@ -19,8 +19,15 @@
           </svg>
         </div>
         <div>
-          <div class="brand-title">Seagull QA Daily Dispatcher</div>
-          <div class="brand-subtitle">Automated Outlook Daily Status Generator for BarTender Cloud & OnPrem</div>
+          <div class="brand-title" style="display:flex;align-items:center;gap:10px">
+            <span data-i18n="brand.title">Seagull QA Daily Dispatcher</span>
+            <select id="lang-select" class="lang-selector" onchange="window.switchLanguage(this.value)" title="Select Interface Language">
+              <option value="en">🇺🇸 EN</option>
+              <option value="es-MX">🇲🇽 ES-MX</option>
+              <option value="es-BO">🇧🇴 ES-BO</option>
+            </select>
+          </div>
+          <div class="brand-subtitle" data-i18n="brand.subtitle">Automated Outlook Daily Status Generator for BarTender Cloud & OnPrem</div>
         </div>
       </div>
 
@@ -30,37 +37,37 @@
 
     <!-- Navigation Tabs -->
     <nav class="tabs-nav">
-      <button class="tab-btn active" data-tab="setup" onclick="switchTab('setup')">1. Project Setup & Links</button>
-      <button class="tab-btn" data-tab="summary" onclick="switchTab('summary')">2. Test Cycles Summary</button>
-      <button class="tab-btn" data-tab="bugs" onclick="switchTab('bugs')">3. List of Bugs (Jira)</button>
-      <button class="tab-btn" data-tab="preview" onclick="switchTab('preview')">4. Live Email Preview</button>
+      <button class="tab-btn active" data-tab="setup" onclick="switchTab('setup')" data-i18n="tabs.setup">1. Project Setup & Links</button>
+      <button class="tab-btn" data-tab="summary" onclick="switchTab('summary')" data-i18n="tabs.summary">2. Test Cycles Summary</button>
+      <button class="tab-btn" data-tab="bugs" onclick="switchTab('bugs')" data-i18n="tabs.bugs">3. List of Bugs (Jira)</button>
+      <button class="tab-btn" data-tab="preview" onclick="switchTab('preview')" data-i18n="tabs.preview">4. Live Email Preview</button>
     </nav>
 
     <!-- TAB 1: SETUP & LINKS -->
     <section id="panel-setup" class="tab-panel active">
       <div id="setup-validation-banner" class="validation-banner">
         <span>⚠️</span>
-        <div>Please provide a valid <strong>Jira Key</strong> (IDEA or Epic) and enter <strong>Feature Story Points (SP)</strong> before proceeding.</div>
+        <div data-i18n="setup.validationBanner">Please provide a valid <strong>Jira Key</strong> (IDEA or Epic) and enter <strong>Feature Story Points (SP)</strong> before proceeding.</div>
       </div>
 
       <div class="grid-2">
         <div class="card">
           <div class="card-header">
-            <div class="card-title">Project & Feature Identification</div>
+            <div class="card-title" data-i18n="setup.cardProject">Project & Feature Identification</div>
           </div>
           <div class="form-group">
-            <label>Feature Initiative Name</label>
-            <input type="text" id="input-feature-name" class="form-control" placeholder="e.g. Intelligent Forms: Refreshable Print Preview" oninput="handleSanitizedTextInput(this, 250)" onblur="handleSanitizedTextBlur(this, 250)">
+            <label data-i18n="setup.featureName">Feature Initiative Name</label>
+            <input type="text" id="input-feature-name" class="form-control" placeholder="e.g. Intelligent Forms: Refreshable Print Preview" data-i18n-placeholder="setup.featureNamePlaceholder" oninput="handleSanitizedTextInput(this, 250)" onblur="handleSanitizedTextBlur(this, 250)">
           </div>
           <div class="grid-2">
             <div class="form-group">
-              <label>Product and Version</label>
-              <input type="text" id="input-product-version" class="form-control" placeholder="e.g. BTC v12.6" oninput="handleProductVersionInput(this.value)" onblur="handleSanitizedTextBlur(this, 50)">
+              <label data-i18n="setup.productVersion">Product and Version</label>
+              <input type="text" id="input-product-version" class="form-control" placeholder="e.g. BTC v12.6" data-i18n-placeholder="setup.productVersionPlaceholder" oninput="handleProductVersionInput(this.value)" onblur="handleSanitizedTextBlur(this, 50)">
             </div>
             <div class="form-group">
-              <label>Execution Start Date</label>
+              <label data-i18n="setup.startDate">Execution Start Date</label>
               <div class="input-action-group date-picker-group">
-                <input type="text" id="input-start-date" class="form-control" placeholder="MM/DD/YYYY" maxlength="10" oninput="handleDateInput(this)" onblur="handleDateBlur(this)" onkeydown="handleDateKeyDown(event)">
+                <input type="text" id="input-start-date" class="form-control" placeholder="MM/DD/YYYY" data-i18n-placeholder="setup.startDatePlaceholder" maxlength="10" oninput="handleDateInput(this)" onblur="handleDateBlur(this)" onkeydown="handleDateKeyDown(event)">
                 <input type="date" id="native-date-picker" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0" tabindex="-1" onchange="handleNativeDateSelect(this.value)">
                 <button type="button" id="btn-date-picker" class="btn btn-secondary btn-icon" onclick="openNativeDatePicker()" title="Select date from calendar" aria-label="Open Calendar">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -76,26 +83,26 @@
           </div>
           <div class="grid-2">
             <div class="form-group">
-              <label>IDEA Jira Key</label>
-              <input type="text" id="input-idea-key" class="form-control" placeholder="IDEA-3110" oninput="handleKeyInput('idea', this.value)">
-              <small id="idea-key-error" class="field-error-msg" style="display:none">Must follow format IDEA-&lt;number&gt; (e.g. IDEA-3110)</small>
+              <label data-i18n="setup.ideaKey">IDEA Jira Key</label>
+              <input type="text" id="input-idea-key" class="form-control" placeholder="IDEA-3110" data-i18n-placeholder="setup.ideaKeyPlaceholder" oninput="handleKeyInput('idea', this.value)">
+              <small id="idea-key-error" class="field-error-msg" style="display:none" data-i18n="setup.ideaKeyHelper">Must follow format IDEA-&lt;number&gt; (e.g. IDEA-3110)</small>
               <small id="idea-key-hint" style="color:var(--text-muted);font-size:11px;display:block;margin-top:4px">
                 Paste key or full Jira URL (auto-extracts)
               </small>
             </div>
             <div class="form-group">
-              <label>Epic Jira Key</label>
-              <input type="text" id="input-epic-key" class="form-control" placeholder="BPLAT-20767" oninput="handleKeyInput('epic', this.value)">
-              <small id="epic-key-error" class="field-error-msg" style="display:none">Must follow format BPLAT-&lt;number&gt; (e.g. BPLAT-20767)</small>
+              <label data-i18n="setup.epicKey">Epic Jira Key</label>
+              <input type="text" id="input-epic-key" class="form-control" placeholder="BPLAT-20767" data-i18n-placeholder="setup.epicKeyPlaceholder" oninput="handleKeyInput('epic', this.value)">
+              <small id="epic-key-error" class="field-error-msg" style="display:none" data-i18n="setup.epicKeyHelper">Must follow format BPLAT-&lt;number&gt; (e.g. BPLAT-20767)</small>
               <small id="epic-key-hint" style="color:var(--text-muted);font-size:11px;display:block;margin-top:4px">
                 Paste key or full Jira URL (auto-extracts)
               </small>
             </div>
           </div>
           <div class="form-group" style="margin-top:6px">
-            <label>JIRA - List of Bugs Filter URL</label>
+            <label data-i18n="setup.bugFilterUrl">JIRA - List of Bugs Filter URL</label>
             <div class="input-action-group">
-              <input type="text" id="input-filter-url" class="form-control" readonly placeholder="Auto-generated based on Jira Key..." style="background:var(--bg-subtle);cursor:default">
+              <input type="text" id="input-filter-url" class="form-control" readonly placeholder="Auto-generated based on Jira Key..." data-i18n-placeholder="setup.bugFilterUrlPlaceholder" style="background:var(--bg-subtle);cursor:default">
               <button type="button" id="btn-copy-filter-url" class="btn btn-secondary btn-icon" onclick="copyFilterUrl()" title="Copy Filter URL to Clipboard" aria-label="Copy Filter URL" disabled>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
@@ -118,15 +125,15 @@
 
         <div class="card">
           <div class="card-header">
-            <div class="card-title">QA Engineer & Scorecard Settings</div>
+            <div class="card-title" data-i18n="setup.cardDistribution">QA Engineer & Scorecard Settings</div>
           </div>
           <div class="form-group">
-            <label>QA Engineer Name</label>
-            <input type="text" id="input-sender-name" class="form-control" placeholder="Alvaro Perez" oninput="handleSanitizedTextInput(this, 100)" onblur="handleSanitizedTextBlur(this, 100)">
+            <label data-i18n="setup.qaEngineer">QA Engineer Name</label>
+            <input type="text" id="input-sender-name" class="form-control" placeholder="Alvaro Perez" data-i18n-placeholder="setup.qaEngineerPlaceholder" oninput="handleSanitizedTextInput(this, 100)" onblur="handleSanitizedTextBlur(this, 100)">
           </div>
           <div class="form-group">
             <label>
-              Feature Story Points
+              <span data-i18n="setup.storyPoints">Feature Story Points</span>
               <span class="tooltip-wrapper">
                 <span class="tooltip-icon">i</span>
                 <span class="tooltip-box">
@@ -134,8 +141,8 @@
                 </span>
               </span>
             </label>
-            <input type="number" id="input-sp" class="form-control" placeholder="e.g. 22" min="0.1" step="any" oninput="handleSpInput(this.value)">
-            <small id="sp-error" class="field-error-msg" style="display:none">Please enter Feature Story Points (SP &gt; 0) to proceed</small>
+            <input type="number" id="input-sp" class="form-control" placeholder="e.g. 22" data-i18n-placeholder="setup.storyPointsPlaceholder" min="0.1" step="any" oninput="handleSpInput(this.value)">
+            <small id="sp-error" class="field-error-msg" style="display:none" data-i18n="setup.storyPointsHelper">Please enter Feature Story Points (SP &gt; 0) to proceed</small>
           </div>
           <div style="margin-top:20px;padding:14px;background:var(--bg-subtle);border-radius:8px;border:1px solid var(--border);font-size:12px;color:var(--text-muted);line-height:1.5">
             <strong style="color:var(--primary);display:block;margin-bottom:4px">💡 Outlook Distribution:</strong>
@@ -149,16 +156,16 @@
         <div style="display:flex;gap:10px;align-items:center">
           <button type="button" class="btn btn-outline-danger" onclick="openResetModal()">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-            Reset Form
+            <span data-i18n="setup.btnReset">Reset Form</span>
           </button>
-          <label for="session-file-input" class="btn btn-secondary" title="Import a previously exported JSON session file" style="cursor:pointer;margin:0;display:inline-flex;align-items:center">
+          <label for="session-file-input" class="btn btn-secondary" title="Import a previously exported JSON session file" data-i18n-title="setup.btnImport" style="cursor:pointer;margin:0;display:inline-flex;align-items:center">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            Import Session
+            <span data-i18n="setup.btnImport">Import Session</span>
           </label>
           <input type="file" id="session-file-input" accept=".json,application/json" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0" onchange="handleSessionFileSelected(event)">
         </div>
         <button type="button" id="btn-continue-cycles" class="btn btn-primary" onclick="proceedToCycles()" disabled>
-          Continue to Cycles &rarr;
+          <span data-i18n="setup.btnContinue">Continue to Cycles &rarr;</span>
         </button>
       </div>
     </section>
@@ -168,7 +175,7 @@
       <div class="card">
         <div class="card-header">
           <div>
-            <div class="card-title">Test Cycles Summary Table</div>
+            <div class="card-title" data-i18n="cycles.title">Test Cycles Summary Table</div>
             <div style="font-size:12px;color:var(--text-muted)">Configure cycle progress. The Total summary row is automatically computed.</div>
           </div>
         </div>
@@ -176,23 +183,23 @@
           <table class="data-table">
             <thead>
               <tr>
-                <th style="width:23%">Area</th>
-                <th style="width:11%">Product Version</th>
-                <th style="width:11%;text-align:center">Ready To Test</th>
-                <th style="width:12%">Testing Status</th>
-                <th style="width:8%;text-align:right">TC Progress %</th>
-                <th style="width:8%;text-align:right">TC Passed %</th>
-                <th style="width:7%;text-align:right"># ReTest</th>
-                <th style="width:7%;text-align:right"># Issues</th>
-                <th style="width:8%;text-align:right"># TestCases</th>
-                <th style="width:4%;text-align:center">Del</th>
+                <th style="width:23%" data-i18n="cycles.thArea">Area</th>
+                <th style="width:11%" data-i18n="setup.productVersion">Product Version</th>
+                <th style="width:11%;text-align:center" data-i18n="cycles.thReady">Ready To Test</th>
+                <th style="width:12%" data-i18n="cycles.thStatus">Testing Status</th>
+                <th style="width:8%;text-align:right" data-i18n="cycles.thProgress">TC Progress %</th>
+                <th style="width:8%;text-align:right" data-i18n="cycles.thPassed">TC Passed %</th>
+                <th style="width:7%;text-align:right" data-i18n="cycles.thRetest"># ReTest</th>
+                <th style="width:7%;text-align:right" data-i18n="cycles.thIssues"># Issues</th>
+                <th style="width:8%;text-align:right" data-i18n="cycles.thTestCases"># TestCases</th>
+                <th style="width:4%;text-align:center" data-i18n="cycles.thDel">Del</th>
               </tr>
             </thead>
             <tbody id="cycles-tbody"></tbody>
             <tfoot>
               <tr class="quick-add-row">
                 <td colspan="10" style="padding:10px 14px;background:#f8fafc;border-top:1px dashed var(--border)">
-                  <button type="button" id="btn-quick-add-cycle" class="btn btn-secondary" onclick="addCycleRow()" title="Add New Test Cycle (Auto-focuses on new cycle)">+ Add Test Cycle</button>
+                  <button type="button" id="btn-quick-add-cycle" class="btn btn-secondary" onclick="addCycleRow()" data-i18n="cycles.btnAdd">+ Add Test Cycle</button>
                 </td>
               </tr>
               <tr id="cycles-totals-row" class="totals-row"></tr>
@@ -200,8 +207,8 @@
           </table>
         </div>
         <div style="margin-top:20px;display:flex;justify-content:space-between">
-          <button class="btn" onclick="switchTab('setup')">&larr; Back to Setup</button>
-          <button class="btn btn-primary" onclick="switchTab('bugs')">Continue to Bugs &rarr;</button>
+          <button class="btn" onclick="switchTab('setup')" data-i18n="cycles.btnBack">&larr; Back to Setup</button>
+          <button class="btn btn-primary" onclick="switchTab('bugs')" data-i18n="cycles.btnContinue">Continue to Bugs &rarr;</button>
         </div>
       </div>
     </section>
@@ -211,20 +218,20 @@
       <div class="card">
         <div class="card-header">
           <div>
-            <div class="card-title">List of Bugs Found (Jira)</div>
+            <div class="card-title" data-i18n="bugs.title">List of Bugs Found (Jira)</div>
             <div style="font-size:12px;color:var(--text-muted)">
               Age is ingested directly from Jira (or auto-calculated from Date Created). Highlight and copy defect rows directly from Jira search.
             </div>
           </div>
           <div style="display:flex;gap:8px;align-items:center">
             <button type="button" class="btn btn-secondary" onclick="openJiraFilter()" title="Open the generated Jira filter URL in a new tab">
-              <span>Open Filter in Jira ↗</span>
+              <span data-i18n="bugs.btnOpenFilter">Open Filter in Jira ↗</span>
             </button>
             <button type="button" class="btn btn-secondary" onclick="openJiraPasteModal()" title="Import/paste rows copied from Jira">
-              <span>📋 Paste from Jira</span>
+              <span data-i18n="bugs.btnImport">📋 Paste from Jira</span>
             </button>
             <button type="button" class="btn btn-secondary" onclick="refreshScorecardLive()" title="Recalculate quality scorecard live from active defect data">
-              <span>🔄 Refresh Scorecard</span>
+              <span data-i18n="bugs.btnRefreshScorecard">🔄 Refresh Scorecard</span>
             </button>
           </div>
         </div>
@@ -232,30 +239,30 @@
           <table class="data-table">
             <thead>
               <tr>
-                <th style="width:8%">Type</th>
-                <th style="width:12%">ID / Key</th>
-                <th style="width:30%">Summary</th>
-                <th style="width:12%">Date Created</th>
-                <th style="width:14%">Severity</th>
-                <th style="width:8%">Status</th>
-                <th style="width:6%;text-align:right"># ReOpen</th>
-                <th style="width:6%;text-align:right">Age</th>
-                <th style="width:4%;text-align:center">Del</th>
+                <th style="width:8%" data-i18n="bugs.thType">Type</th>
+                <th style="width:12%" data-i18n="bugs.thKey">ID / Key</th>
+                <th style="width:30%" data-i18n="bugs.thSummary">Summary</th>
+                <th style="width:12%" data-i18n="bugs.thDateCreated">Date Created</th>
+                <th style="width:14%" data-i18n="bugs.thSeverity">Severity</th>
+                <th style="width:8%" data-i18n="bugs.thStatus">Status</th>
+                <th style="width:6%;text-align:right" data-i18n="bugs.thReopen"># ReOpen</th>
+                <th style="width:6%;text-align:right" data-i18n="bugs.thAge">Age</th>
+                <th style="width:4%;text-align:center" data-i18n="bugs.thDel">Del</th>
               </tr>
             </thead>
             <tbody id="bugs-tbody"></tbody>
             <tfoot>
               <tr class="quick-add-row">
                 <td colspan="9" style="padding:10px 14px;background:#f8fafc;border-top:1px dashed var(--border)">
-                  <button type="button" id="btn-quick-add-bug" class="btn btn-secondary" onclick="addBugRow()" title="Add New Defect Row">+ Add Bug</button>
+                  <button type="button" id="btn-quick-add-bug" class="btn btn-secondary" onclick="addBugRow()" data-i18n="bugs.btnAdd">+ Add Bug</button>
                 </td>
               </tr>
             </tfoot>
           </table>
         </div>
         <div style="margin-top:20px;display:flex;justify-content:space-between">
-          <button class="btn" onclick="switchTab('summary')">&larr; Back to Cycles</button>
-          <button class="btn btn-primary" onclick="switchTab('preview')">Generate Live Preview &rarr;</button>
+          <button class="btn" onclick="switchTab('summary')" data-i18n="bugs.btnBack">&larr; Back to Cycles</button>
+          <button class="btn btn-primary" onclick="switchTab('preview')" data-i18n="bugs.btnContinue">Generate Live Preview &rarr;</button>
         </div>
       </div>
     </section>
@@ -264,7 +271,7 @@
     <section id="panel-preview" class="tab-panel">
       <!-- 1. Title plus message -->
       <div class="preview-page-header">
-        <h3 style="font-size:16px;font-weight:700;color:var(--primary);margin:0 0 4px 0">Live Outlook Email Preview</h3>
+        <h3 style="font-size:16px;font-weight:700;color:var(--primary);margin:0 0 4px 0" data-i18n="preview.title">Live Outlook Email Preview</h3>
         <p style="font-size:13px;color:var(--text-muted);margin:0">
           Inspect formatting below before copying. All Word 15 MSO styles, tables, and images are rendered live.
         </p>
@@ -279,7 +286,7 @@
             <line x1="12" y1="17" x2="12.01" y2="17"></line>
           </svg>
           <div>
-            <span style="font-weight:700;color:#991b1b">Outdated Session Date:</span>
+            <span style="font-weight:700;color:#991b1b" data-i18n="preview.staleBannerTitle">Outdated Session Date:</span>
             <span style="color:#7f1d1d;margin-left:4px">
               The subject line contains a past session date (<strong id="stale-date-recorded">09-25-2026</strong>). Click <strong>Refresh Preview</strong> to update to today's date (<strong id="stale-date-today">09-28-2026</strong>).
             </span>
@@ -289,7 +296,7 @@
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
           </svg>
-          <span>Update to Today</span>
+          <span data-i18n="preview.btnRefresh">Update to Today</span>
         </button>
       </div>
 
@@ -310,15 +317,24 @@
       <!-- 3. Preview of formatted email with refresh preview button & copy icon in top toolbar -->
       <div class="preview-frame-container">
         <div class="preview-toolbar">
-          <span style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--text-muted);letter-spacing:0.5px">
-            Formatted Email Preview
-          </span>
+          <div style="display:flex;align-items:center;gap:14px">
+            <span style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--text-muted);letter-spacing:0.5px" data-i18n="preview.title">
+              Formatted Email Preview
+            </span>
+            <div class="email-lang-toggle-wrapper">
+              <span class="email-lang-label" data-i18n="preview.emailLangLabel" style="font-size:11px;font-weight:600;color:var(--text-muted)">Email Language:</span>
+              <div class="btn-group-toggle">
+                <button type="button" id="btn-email-lang-en" class="btn-toggle active" onclick="window.switchEmailLanguage('en')" title="Format email headings and greetings in English">🇺🇸 EN</button>
+                <button type="button" id="btn-email-lang-es" class="btn-toggle" onclick="window.switchEmailLanguage('es')" title="Format email headings and greetings in Spanish">🇪🇸 ES</button>
+              </div>
+            </div>
+          </div>
           <div style="display:flex;align-items:center;gap:8px">
             <button type="button" class="btn btn-secondary" onclick="refreshPreviewManually()" title="Refresh preview with latest data" style="display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:6px 12px">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
               </svg>
-              <span>Refresh Preview</span>
+              <span data-i18n="preview.btnRefresh">Refresh Preview</span>
             </button>
             <button type="button" class="btn btn-secondary btn-icon" onclick="copyEmailToClipboard()" title="Copy Formatted Email to Clipboard" aria-label="Copy Formatted Email" style="padding:7px 11px;display:inline-flex;align-items:center;justify-content:center">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -334,14 +350,14 @@
       <!-- Bottom Actions: Back to Bugs & Export Session (Left) & Copy Formatted Email (Right) on the same line -->
       <div class="preview-bottom-actions" style="display:flex;justify-content:space-between;align-items:center;width:100%;margin-top:16px">
         <div style="display:flex;gap:10px;align-items:center">
-          <button type="button" class="btn" onclick="switchTab('bugs')" title="Return to Defect Entry Tab">&larr; Back to Bugs</button>
+          <button type="button" class="btn" onclick="switchTab('bugs')" title="Return to Defect Entry Tab" data-i18n="preview.btnBack">&larr; Back to Bugs</button>
           <button type="button" class="btn btn-secondary" onclick="exportSessionJson()" title="Save all state and tables to a downloadable JSON file" style="display:inline-flex;align-items:center;gap:8px">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
               <polyline points="7 10 12 15 17 10"></polyline>
               <line x1="12" y1="15" x2="12" y2="3"></line>
             </svg>
-            <span>Export Session</span>
+            <span data-i18n="preview.btnExport">Export Session</span>
           </button>
         </div>
         <button type="button" class="btn btn-primary" onclick="copyEmailToClipboard()" style="display:inline-flex;align-items:center;gap:8px">
@@ -349,7 +365,7 @@
             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
           </svg>
-          <span>Copy Formatted Email</span>
+          <span data-i18n="preview.btnCopy">Copy Formatted Email</span>
         </button>
       </div>
     </section>
@@ -362,19 +378,19 @@
       <div class="modal-header">
         <div class="modal-title">
           <span style="font-size:18px">⚠️</span>
-          <span>Reset Form to Initial State?</span>
+          <span data-i18n="modalReset.title">Reset Form to Initial State?</span>
         </div>
         <button type="button" class="modal-close-btn" onclick="closeResetModal()" aria-label="Close">&times;</button>
       </div>
       <div class="modal-body">
-        <p>Are you sure you want to reset all form fields? This will clear all entered project identification details, test cycles, and bug entries from your browser's local cache and start fresh.</p>
+        <p data-i18n="modalReset.body">Are you sure you want to reset all form fields? This will clear all entered project identification details, test cycles, and bug entries from your browser's local cache and start fresh.</p>
         <p style="margin-top:12px;font-size:12px;color:var(--text-muted)">
           <strong>Note:</strong> This action cannot be undone.
         </p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn" onclick="closeResetModal()">Cancel</button>
-        <button type="button" class="btn btn-danger" onclick="confirmResetForm()">Yes, Reset Form</button>
+        <button type="button" class="btn" onclick="closeResetModal()" data-i18n="modalReset.cancel">Cancel</button>
+        <button type="button" class="btn btn-danger" onclick="confirmResetForm()" data-i18n="modalReset.confirm">Yes, Reset Form</button>
       </div>
     </div>
   </div>
@@ -385,7 +401,7 @@
       <div class="modal-header">
         <div class="modal-title">
           <span style="font-size:18px">📋</span>
-          <span>Import Defects from Jira</span>
+          <span data-i18n="modalJira.title">Import Defects from Jira</span>
         </div>
         <button type="button" class="modal-close-btn" onclick="closeJiraPasteModal()" aria-label="Close">&times;</button>
       </div>
@@ -393,20 +409,20 @@
         <div class="jira-import-steps">
           <div class="import-step">
             <span class="step-num">1</span>
-            <span>Click <a href="javascript:void(0)" onclick="openJiraFilter()" style="color:var(--primary);font-weight:600">Open Filter in Jira ↗</a> to view your defects search table.</span>
+            <span data-i18n="modalJira.step1">Click <a href="javascript:void(0)" onclick="openJiraFilter()" style="color:var(--primary);font-weight:600">Open Filter in Jira ↗</a> to view your defects search table.</span>
           </div>
           <div class="import-step">
             <span class="step-num">2</span>
-            <span>Highlight the defect rows (with or without column headers) and press <kbd>Cmd+C</kbd> / <kbd>Ctrl+C</kbd>.</span>
+            <span data-i18n="modalJira.step2">Highlight the defect rows (with or without column headers) and press <kbd>Cmd+C</kbd> / <kbd>Ctrl+C</kbd>.</span>
           </div>
           <div class="import-step">
             <span class="step-num">3</span>
-            <span>Paste below (or click <strong>Read Clipboard</strong>). Pure clipboard copy — no files or Excel required!</span>
+            <span data-i18n="modalJira.step3">Paste below (or click <strong>Read Clipboard</strong>). Pure clipboard copy — no files or Excel required!</span>
           </div>
         </div>
 
         <div style="margin-top:14px">
-          <textarea id="jira-paste-input" class="form-control" style="height:130px;font-family:monospace;font-size:12px;resize:vertical" placeholder="Paste copied Jira table rows here (Tab-separated rows, XML, or JSON)..." oninput="previewPastedJiraData()"></textarea>
+          <textarea id="jira-paste-input" class="form-control" style="height:130px;font-family:monospace;font-size:12px;resize:vertical" placeholder="Paste copied Jira table rows here (Tab-separated rows, XML, or JSON)..." data-i18n-placeholder="modalJira.pastePlaceholder" oninput="previewPastedJiraData()"></textarea>
         </div>
 
         <div id="jira-paste-preview-container" style="display:none;margin-top:14px">
@@ -419,11 +435,11 @@
               <thead>
                 <tr>
                   <th style="width:10%">Type</th>
-                  <th style="width:18%">Key</th>
-                  <th style="width:38%">Summary</th>
-                  <th style="width:18%">Severity</th>
-                  <th style="width:10%">Status</th>
-                  <th style="width:6%;text-align:right">Age</th>
+                  <th style="width:18%" data-i18n="bugs.thKey">Key</th>
+                  <th style="width:38%" data-i18n="bugs.thSummary">Summary</th>
+                  <th style="width:18%" data-i18n="bugs.thSeverity">Severity</th>
+                  <th style="width:10%" data-i18n="bugs.thStatus">Status</th>
+                  <th style="width:6%;text-align:right" data-i18n="bugs.thAge">Age</th>
                 </tr>
               </thead>
               <tbody id="jira-paste-preview-tbody"></tbody>
@@ -434,18 +450,18 @@
         <div style="margin-top:16px;display:flex;align-items:center;gap:18px">
           <label style="display:flex;align-items:center;gap:6px;font-size:12.5px;cursor:pointer">
             <input type="radio" name="jira-import-mode" value="replace" checked>
-            <span>Replace existing bugs</span>
+            <span data-i18n="modalJira.modeReplace">Replace existing bugs</span>
           </label>
           <label style="display:flex;align-items:center;gap:6px;font-size:12.5px;cursor:pointer">
             <input type="radio" name="jira-import-mode" value="append">
-            <span>Append to existing bugs</span>
+            <span data-i18n="modalJira.modeAppend">Append to existing bugs</span>
           </label>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn" onclick="closeJiraPasteModal()">Cancel</button>
-        <button type="button" class="btn btn-secondary" onclick="readFromClipboardDirectly()">📋 Read Clipboard</button>
-        <button type="button" class="btn btn-primary" id="btn-confirm-jira-import" onclick="confirmJiraImport()" disabled>Import Defects</button>
+        <button type="button" class="btn" onclick="closeJiraPasteModal()" data-i18n="modalJira.cancel">Cancel</button>
+        <button type="button" class="btn btn-secondary" onclick="readFromClipboardDirectly()" data-i18n="modalJira.readClipboard">📋 Read Clipboard</button>
+        <button type="button" class="btn btn-primary" id="btn-confirm-jira-import" onclick="confirmJiraImport()" disabled data-i18n="modalJira.confirm">Import Defects</button>
       </div>
     </div>
   </div>
@@ -454,6 +470,6 @@
   <div id="toast" class="toast"></div>
 
   <!-- ES Module Application Entrypoint -->
-  <script type="module" src="js/app.js?v=43"></script>
+  <script type="module" src="js/app.js?v=44"></script>
 </body>
 </html>

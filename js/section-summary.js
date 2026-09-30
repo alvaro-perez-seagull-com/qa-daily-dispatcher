@@ -184,8 +184,21 @@ export const SectionSummary = {
   /**
    * Renders the exact Outlook MSO HTML Table
    */
-  renderMsoHtml(cycles) {
+  renderMsoHtml(cycles, options = {}) {
+    const isSpanish = Boolean(options && (options.isSpanish || options.emailLocale === 'es' || options.emailLocale === 'es-MX'));
     const totals = this.calculateTotals(cycles);
+
+    const thSummary = isSpanish ? 'Resumen de ciclos de prueba' : 'Summary';
+    const thArea = isSpanish ? 'Área / Ciclo' : 'Area';
+    const thProductVersion = isSpanish ? 'Producto y versión' : 'Product Version';
+    const thReady = isSpanish ? 'Listo para probar' : 'Ready To Test';
+    const thStatus = isSpanish ? 'Estado de pruebas' : 'Testing Status';
+    const thProgress = isSpanish ? 'Progreso' : 'TC Progress %';
+    const thPassed = isSpanish ? 'Aprobados' : 'TC Passed %';
+    const thRetest = isSpanish ? 'Reevaluar' : '# ReTest';
+    const thIssues = isSpanish ? 'Nº Defectos' : '# Issues';
+    const thTestCases = isSpanish ? 'Nº Casos' : '# TestCases';
+    const lblTotal = 'Total';
 
     const rowsHtml = cycles.map((c, idx) => `
  <tr style='mso-yfti-irow:${idx + 1};height:25.5pt'>
@@ -196,7 +209,7 @@ export const SectionSummary = {
    <p class=MsoNormal><span style='font-size:10.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>${c.productVersion}<o:p></o:p></span></p>
   </td>
   <td width=88 valign=top style='width:66.0pt;border:solid black 1.0pt;border-left:none;padding:0in 5.4pt 0in 5.4pt;height:25.5pt'>
-   <p class=MsoNormal align=center style='text-align:center'><span style='font-size:10.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>${c.readyToTest ? 'TRUE' : 'FALSE'}<o:p></o:p></span></p>
+   <p class=MsoNormal align=center style='text-align:center'><span style='font-size:10.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>${isSpanish ? (c.readyToTest ? 'SÍ' : 'NO') : (c.readyToTest ? 'TRUE' : 'FALSE')}<o:p></o:p></span></p>
   </td>
   <td width=119 valign=top style='width:89.0pt;border:solid black 1.0pt;border-left:none;padding:0in 5.4pt 0in 5.4pt;height:25.5pt'>
    <p class=MsoNormal align=center style='text-align:center'><span style='font-size:10.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>${c.testingStatus || '-'}<o:p></o:p></span></p>
@@ -219,38 +232,38 @@ export const SectionSummary = {
  </tr>`).join('');
 
     return `
-<h2 class=MsoHeading2 style='mso-style-name:"Heading 2";mso-outline-level:2;margin-top:12.0pt;margin-right:0in;margin-bottom:6.0pt;margin-left:0in;page-break-after:avoid;font-size:15.0pt;font-family:"Segoe UI",Arial,sans-serif;color:#0F4761;font-weight:bold'><span class=Heading2Char style='mso-style-name:"Heading 2 Char";font-size:15.0pt;font-family:"Segoe UI",Arial,sans-serif;color:#0F4761;font-weight:bold;mso-fareast-font-family:"Times New Roman"'>Summary<o:p></o:p></span></h2>
+<h2 class=MsoHeading2 style='mso-style-name:"Heading 2";mso-outline-level:2;margin-top:12.0pt;margin-right:0in;margin-bottom:6.0pt;margin-left:0in;page-break-after:avoid;font-size:15.0pt;font-family:"Segoe UI",Arial,sans-serif;color:#0F4761;font-weight:bold'><span class=Heading2Char style='mso-style-name:"Heading 2 Char";font-size:15.0pt;font-family:"Segoe UI",Arial,sans-serif;color:#0F4761;font-weight:bold;mso-fareast-font-family:"Times New Roman"'>${thSummary}<o:p></o:p></span></h2>
 <p class=MsoNormal><o:p>&nbsp;</o:p></p>
 
 <table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width=1110
  style='width:832.5pt;border-collapse:collapse;mso-yfti-tbllook:1184;mso-padding-alt:0in 0in 0in 0in'>
  <tr style='mso-yfti-irow:0;mso-yfti-firstrow:yes;height:12.75pt'>
   <td width=336 nowrap valign=top style='width:251.5pt;background:#B3CEFB;padding:0in 5.4pt 0in 5.4pt;height:12.75pt'>
-  <p class=MsoNormal align=center style='text-align:center'><b><span style='font-size:8.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>Area</span></b><o:p></o:p></p>
+  <p class=MsoNormal align=center style='text-align:center'><b><span style='font-size:8.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>${thArea}</span></b><o:p></o:p></p>
   </td>
   <td width=115 nowrap valign=top style='width:86.0pt;background:#B3CEFB;padding:0in 5.4pt 0in 5.4pt;height:12.75pt'>
-  <p class=MsoNormal align=center style='text-align:center'><b><span style='font-size:8.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>Product Version</span></b><o:p></o:p></p>
+  <p class=MsoNormal align=center style='text-align:center'><b><span style='font-size:8.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>${thProductVersion}</span></b><o:p></o:p></p>
   </td>
   <td width=88 nowrap valign=top style='width:66.0pt;background:#B3CEFB;padding:0in 5.4pt 0in 5.4pt;height:12.75pt'>
-  <p class=MsoNormal align=center style='text-align:center'><b><span style='font-size:8.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>Ready To Test</span></b><o:p></o:p></p>
+  <p class=MsoNormal align=center style='text-align:center'><b><span style='font-size:8.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>${thReady}</span></b><o:p></o:p></p>
   </td>
   <td width=119 nowrap valign=top style='width:89.0pt;background:#B3CEFB;padding:0in 5.4pt 0in 5.4pt;height:12.75pt'>
-  <p class=MsoNormal align=center style='text-align:center'><b><span style='font-size:8.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>Testing Status</span></b><o:p></o:p></p>
+  <p class=MsoNormal align=center style='text-align:center'><b><span style='font-size:8.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>${thStatus}</span></b><o:p></o:p></p>
   </td>
   <td width=88 nowrap valign=top style='width:66.0pt;background:#B3CEFB;padding:0in 5.4pt 0in 5.4pt;height:12.75pt'>
-  <p class=MsoNormal align=center style='text-align:center'><b><span style='font-size:8.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>TC Progress %</span></b><o:p></o:p></p>
+  <p class=MsoNormal align=center style='text-align:center'><b><span style='font-size:8.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>${thProgress}</span></b><o:p></o:p></p>
   </td>
   <td width=95 nowrap valign=top style='width:71.0pt;background:#B3CEFB;padding:0in 5.4pt 0in 5.4pt;height:12.75pt'>
-  <p class=MsoNormal align=center style='text-align:center'><b><span style='font-size:8.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>TC Passed %</span></b><o:p></o:p></p>
+  <p class=MsoNormal align=center style='text-align:center'><b><span style='font-size:8.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>${thPassed}</span></b><o:p></o:p></p>
   </td>
   <td width=95 nowrap valign=top style='width:71.0pt;background:#B3CEFB;padding:0in 5.4pt 0in 5.4pt;height:12.75pt'>
-  <p class=MsoNormal align=center style='text-align:center'><b><span style='font-size:8.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'># ReTest</span></b><o:p></o:p></p>
+  <p class=MsoNormal align=center style='text-align:center'><b><span style='font-size:8.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>${thRetest}</span></b><o:p></o:p></p>
   </td>
   <td width=88 nowrap valign=top style='width:66.0pt;background:#B3CEFB;padding:0in 5.4pt 0in 5.4pt;height:12.75pt'>
-  <p class=MsoNormal align=center style='text-align:center'><b><span style='font-size:8.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'># Issues</span></b><o:p></o:p></p>
+  <p class=MsoNormal align=center style='text-align:center'><b><span style='font-size:8.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>${thIssues}</span></b><o:p></o:p></p>
   </td>
   <td width=88 nowrap valign=top style='width:66.0pt;background:#B3CEFB;padding:0in 5.4pt 0in 5.4pt;height:12.75pt'>
-  <p class=MsoNormal align=center style='text-align:center'><b><span style='font-size:8.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'># TestCases</span></b><o:p></o:p></p>
+  <p class=MsoNormal align=center style='text-align:center'><b><span style='font-size:8.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>${thTestCases}</span></b><o:p></o:p></p>
   </td>
  </tr>
  ${rowsHtml}
@@ -258,7 +271,7 @@ export const SectionSummary = {
  <tr style='mso-yfti-irow:${cycles.length + 2};mso-yfti-lastrow:yes;height:12.75pt'>
   <td colspan=3 style='border:none;padding:0in 5.4pt 0in 5.4pt;height:12.75pt'></td>
   <td width=119 nowrap valign=bottom style='width:89.0pt;border:solid black 1.0pt;padding:0in 5.4pt 0in 5.4pt;height:12.75pt'>
-  <p class=MsoNormal><b><span style='font-size:10.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>Total<o:p></o:p></span></b></p>
+  <p class=MsoNormal><b><span style='font-size:10.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>${lblTotal}<o:p></o:p></span></b></p>
   </td>
   <td width=88 nowrap valign=bottom style='width:66.0pt;border:solid black 1.0pt;border-left:none;padding:0in 5.4pt 0in 5.4pt;height:12.75pt'>
   <p class=MsoNormal align=right style='text-align:right'><b><span style='font-size:10.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>${totals.progress}<o:p></o:p></span></b></p>

@@ -97,7 +97,8 @@ export const SectionBugsList = {
   /**
    * Renders the exact Outlook MSO HTML Table for List of Bugs Found
    */
-  renderMsoHtml(bugs = [], referenceDate = new Date()) {
+  renderMsoHtml(bugs = [], referenceDate = new Date(), options = {}) {
+    const isSpanish = Boolean(options && (options.isSpanish || options.emailLocale === 'es' || options.emailLocale === 'es-MX'));
     const bugRowsHtml = (bugs || []).map((b, idx) => {
       const age = this.getBugAge(b, referenceDate);
       const dateStr = this.formatDateCreated(b.dateCreated);
@@ -150,36 +151,46 @@ export const SectionBugsList = {
  </tr>`;
     }
 
+    const headingText = isSpanish ? 'Lista de defectos encontrados' : 'List of Bugs Found';
+    const thType = isSpanish ? 'Tipo' : 'Type';
+    const thID = 'ID';
+    const thSummary = isSpanish ? 'Resumen' : 'Summary';
+    const thDateCreated = isSpanish ? 'Fecha de creación' : 'Date Created';
+    const thSeverity = isSpanish ? 'Severidad' : 'Severity';
+    const thStatus = isSpanish ? 'Estado' : 'Status';
+    const thReopened = isSpanish ? 'Nº Reabierto' : '# ReOpened';
+    const thAge = isSpanish ? 'Antigüedad' : 'Age';
+
     return `
-<h2 class=MsoHeading2 style='mso-style-name:"Heading 2";mso-outline-level:2;margin-top:12.0pt;margin-right:0in;margin-bottom:6.0pt;margin-left:0in;page-break-after:avoid;font-size:15.0pt;font-family:"Segoe UI",Arial,sans-serif;color:#0F4761;font-weight:bold'><span class=Heading2Char style='mso-style-name:"Heading 2 Char";font-size:15.0pt;font-family:"Segoe UI",Arial,sans-serif;color:#0F4761;font-weight:bold;mso-fareast-font-family:"Times New Roman"'>List of Bugs Found<o:p></o:p></span></h2>
+<h2 class=MsoHeading2 style='mso-style-name:"Heading 2";mso-outline-level:2;margin-top:12.0pt;margin-right:0in;margin-bottom:6.0pt;margin-left:0in;page-break-after:avoid;font-size:15.0pt;font-family:"Segoe UI",Arial,sans-serif;color:#0F4761;font-weight:bold'><span class=Heading2Char style='mso-style-name:"Heading 2 Char";font-size:15.0pt;font-family:"Segoe UI",Arial,sans-serif;color:#0F4761;font-weight:bold;mso-fareast-font-family:"Times New Roman"'>${headingText}<o:p></o:p></span></h2>
 <p class=MsoNormal><o:p>&nbsp;</o:p></p>
 
 <table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width=1110
  style='width:832.5pt;border-collapse:collapse;mso-yfti-tbllook:1184;mso-padding-alt:0in 0in 0in 0in'>
  <tr style='mso-yfti-irow:0;mso-yfti-firstrow:yes;height:12.75pt'>
   <td width=89 nowrap valign=top style='width:67.0pt;background:#B3CEFB;padding:0in 5.4pt 0in 5.4pt;height:12.75pt'>
-  <p class=MsoNormal><b><span style='font-size:8.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>Type</span></b><o:p></o:p></p>
+  <p class=MsoNormal><b><span style='font-size:8.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>${thType}</span></b><o:p></o:p></p>
   </td>
   <td width=127 valign=top style='width:95.0pt;background:#B3CEFB;padding:0in 5.4pt 0in 5.4pt;height:12.75pt'>
-  <p class=MsoNormal><b><span style='font-size:8.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>ID</span></b><o:p></o:p></p>
+  <p class=MsoNormal><b><span style='font-size:8.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>${thID}</span></b><o:p></o:p></p>
   </td>
   <td width=378 valign=top style='width:283.5pt;background:#B3CEFB;padding:0in 5.4pt 0in 5.4pt;height:12.75pt'>
-  <p class=MsoNormal><b><span style='font-size:8.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>Summary</span></b><o:p></o:p></p>
+  <p class=MsoNormal><b><span style='font-size:8.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>${thSummary}</span></b><o:p></o:p></p>
   </td>
   <td width=120 nowrap valign=top style='width:1.25in;background:#B3CEFB;padding:0in 5.4pt 0in 5.4pt;height:12.75pt'>
-  <p class=MsoNormal><b><span style='font-size:8.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>Date Created</span></b><o:p></o:p></p>
+  <p class=MsoNormal><b><span style='font-size:8.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>${thDateCreated}</span></b><o:p></o:p></p>
   </td>
   <td width=126 nowrap valign=top style='width:94.5pt;background:#B3CEFB;padding:0in 5.4pt 0in 5.4pt;height:12.75pt'>
-  <p class=MsoNormal><b><span style='font-size:8.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>Severity</span></b><o:p></o:p></p>
+  <p class=MsoNormal><b><span style='font-size:8.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>${thSeverity}</span></b><o:p></o:p></p>
   </td>
   <td width=68 nowrap valign=top style='width:51.0pt;background:#B3CEFB;padding:0in 5.4pt 0in 5.4pt;height:12.75pt'>
-  <p class=MsoNormal><b><span style='font-size:8.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>Status</span></b><o:p></o:p></p>
+  <p class=MsoNormal><b><span style='font-size:8.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>${thStatus}</span></b><o:p></o:p></p>
   </td>
   <td width=88 nowrap valign=top style='width:66.0pt;background:#B3CEFB;padding:0in 5.4pt 0in 5.4pt;height:12.75pt'>
-  <p class=MsoNormal><b><span style='font-size:8.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'># ReOpened</span></b><o:p></o:p></p>
+  <p class=MsoNormal><b><span style='font-size:8.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>${thReopened}</span></b><o:p></o:p></p>
   </td>
   <td width=114 nowrap valign=top style='width:85.5pt;background:#B3CEFB;padding:0in 5.4pt 0in 5.4pt;height:12.75pt'>
-  <p class=MsoNormal><b><span style='font-size:8.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>Age</span></b><o:p></o:p></p>
+  <p class=MsoNormal><b><span style='font-size:8.0pt;font-family:"Arial",sans-serif;color:black;mso-ligatures:none'>${thAge}</span></b><o:p></o:p></p>
   </td>
  </tr>
  ${bugRowsHtml}

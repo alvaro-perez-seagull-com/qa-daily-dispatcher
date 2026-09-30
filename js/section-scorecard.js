@@ -337,11 +337,13 @@ export const SectionScorecard = {
   /**
    * Renders the exact Outlook MSO HTML for Quality Scorecard section
    */
-  renderMsoHtml(scorecardBase64, metrics = null) {
+  renderMsoHtml(scorecardBase64, metrics = null, options = {}) {
+    const isSpanish = Boolean(options && (options.isSpanish || options.emailLocale === 'es' || options.emailLocale === 'es-MX'));
     const titleAttr = metrics && metrics.errorMessage ? ` title="${metrics.errorMessage.replace(/"/g, '&quot;')}"` : '';
-    const altAttr = metrics && metrics.missingStoryPoints ? 'Scorecard Uncomputed - Story Points Required' : 'Quality Scorecard';
+    const altAttr = metrics && metrics.missingStoryPoints ? 'Scorecard Uncomputed - Story Points Required' : (isSpanish ? 'Puntuación de calidad' : 'Quality Scorecard');
+    const headingText = isSpanish ? 'Puntuación de calidad' : 'Quality Scorecard';
     return `
-<h2 class=MsoHeading2 style='mso-style-name:"Heading 2";mso-outline-level:2;margin-top:12.0pt;margin-right:0in;margin-bottom:6.0pt;margin-left:0in;page-break-after:avoid;font-size:15.0pt;font-family:"Segoe UI",Arial,sans-serif;color:#0F4761;font-weight:bold'><span class=Heading2Char style='mso-style-name:"Heading 2 Char";font-size:15.0pt;font-family:"Segoe UI",Arial,sans-serif;color:#0F4761;font-weight:bold;mso-fareast-font-family:"Times New Roman"'>Quality Scorecard<o:p></o:p></span></h2>
+<h2 class=MsoHeading2 style='mso-style-name:"Heading 2";mso-outline-level:2;margin-top:12.0pt;margin-right:0in;margin-bottom:6.0pt;margin-left:0in;page-break-after:avoid;font-size:15.0pt;font-family:"Segoe UI",Arial,sans-serif;color:#0F4761;font-weight:bold'><span class=Heading2Char style='mso-style-name:"Heading 2 Char";font-size:15.0pt;font-family:"Segoe UI",Arial,sans-serif;color:#0F4761;font-weight:bold;mso-fareast-font-family:"Times New Roman"'>${headingText}<o:p></o:p></span></h2>
 <p class=MsoNormal><o:p>&nbsp;</o:p></p>
 <p class=MsoNormal><img width=506 height=100 src="${scorecardBase64}"${titleAttr} alt="${altAttr}" style='height:1.042in;width:5.27in'></p>
 <p class=MsoNormal><o:p>&nbsp;</o:p></p>

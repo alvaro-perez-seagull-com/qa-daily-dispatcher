@@ -59,13 +59,22 @@ This document tracks prospective feature requests, UX enhancements, and architec
 
 ---
 
-### 4. Spanish Localization (Bolivia QA Team Support) (`💡 Idea / In Discussion`)
-* **Problem Statement:** Ensure QA team members in the Cochabamba, Bolivia office can comfortably navigate and operate the daily dispatch tool in their native Spanish language.
-* **Proposed Scope:**
-  * **UI Language Toggle:** Simple header toggle (`🇺🇸 EN` | `🇧🇴 ES`) in the top navigation bar.
-  * **I18n Translation Dictionary (`js/i18n.js`):** Modular JSON dictionary mapping all UI strings (labels, placeholders, tooltips, validation messages, toast notifications, and modal dialogs).
-  * **Email Language Preservation:** By default, generated Outlook email status tables, greetings, and column headers remain in standard English for global corporate distribution, with an optional toggle to generate Spanish status reports if communicating with regional squads.
-  * **No Other Languages Needed:** Exclusively scoped to English & Spanish.
+### 4. Spanish Multi-Locale Localization (`en`, `es-MX`, `es-BO`) (`✅ Completed / Released`)
+* **Problem Statement:** Ensure QA team members across regional engineering hubs (including Cochabamba, Bolivia and Latin America) can comfortably navigate and operate the daily dispatch tool in their native Spanish language.
+* **Delivered Scope:**
+  * **Header Language Selector Dropdown:** Compact, elegant dropdown (`🇺🇸 EN`, `🇲🇽 ES-MX`, `🇧🇴 ES-BO`) integrated beside the brand title in the header with custom SVG chevron.
+  * **Modular I18n Engine (`js/i18n.js`):** Modular internationalization dictionary mapping all UI strings across navigation tabs, form cards, field labels, placeholders, tooltips, validation messages, toast notifications, table headers, and modal dialogs.
+  * **Regional QA Nuance Support:**
+    - Mexico (`es-MX`): *"Nombre de la iniciativa de funcionalidad"*, *"Restablecer formulario"*, *"Estimado equipo,"*.
+    - Bolivia (`es-BO`): *"Nombre del módulo / iniciativa"*, *"Reiniciar formulario"*, *"Saludos cordiales equipo,"*, *"Nº Defectos"*.
+  * **In-Place Reactive Translation (Zero Data Loss):** Updates text nodes and placeholders directly without rebuilding form input elements, preserving typed values, cursor focus, and unsaved form data.
+  * **Persistent Preference:** Saves language preference to `localStorage` (`seagull_qa_lang`) and automatically infers regional dialect via `navigator.language` on first visit.
+  * **Live Email Preview Language Toggle:**
+    - By default, generated Outlook email reports retain standard English headings and greetings for corporate distribution.
+    - Added an on-demand toggle pill (`[ Email Language: 🇺🇸 EN | 🇪🇸 ES ]`) inside Tab 4's preview toolbar.
+    - Switching email language to Spanish translates section headings (`Resumen de ciclos de prueba`, `Puntuación de calidad`, `Defectos por severidad`, `Lista de defectos encontrados`, `Enlaces rápidos`), table column headers, and email greetings (`Hola a todos,`).
+    - **Subject Line Date Lockdown:** Strictly enforces that the email subject line date format remains locked to `YYYY-MM-DD` (e.g., `BTC v12.6: [IDEA-3110] - BPLAT-20767 - Feature Name - Daily Status - YYYY-MM-DD`).
+  * **Empirical Verification:** Automated Playwright suite (`tests/test-localization.mjs`) verified 100% dictionary coverage, zero input data loss, browser reload persistence, and subject date integrity.
 
 ---
 

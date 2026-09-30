@@ -103,9 +103,9 @@ export const SectionIntro = {
    * Formats the sent date header in Outlook style
    * e.g.: Wednesday, September 23, 2026 10:53 AM
    */
-  formatSentDate(date = new Date()) {
+  formatSentDate(date = new Date(), options = {}) {
     const d = (date instanceof Date && !isNaN(date)) ? date : new Date(date || Date.now());
-    const options = { 
+    const opt = { 
       weekday: 'long', 
       year: 'numeric', 
       month: 'long', 
@@ -114,42 +114,52 @@ export const SectionIntro = {
       minute: '2-digit', 
       hour12: true 
     };
-    return d.toLocaleDateString('en-US', options);
+    const locale = options && options.isSpanish ? 'es-MX' : 'en-US';
+    return d.toLocaleDateString(locale, opt);
   },
 
   /**
    * Renders the MSO HTML Header & Opening Paragraphs
    */
-  renderMsoHtml(data) {
-    const sentDateStr = this.formatSentDate(data.sentDate || new Date());
+  renderMsoHtml(data, options = {}) {
+    const isSpanish = Boolean(options && (options.isSpanish || options.emailLocale === 'es' || options.emailLocale === 'es-MX'));
+    const sentDateStr = this.formatSentDate(data.sentDate || new Date(), { isSpanish });
     const subject = this.generateSubject(data);
     const toRecipients = data.toRecipients || [];
     const ccRecipients = data.ccRecipients || [];
     const hasRecipients = toRecipients.length > 0 || ccRecipients.length > 0;
+
+    const lblFrom = isSpanish ? 'De:' : 'From:';
+    const lblSent = isSpanish ? 'Enviado:' : 'Sent:';
+    const lblTo = isSpanish ? 'Para:' : 'To:';
+    const lblCc = isSpanish ? 'CC:' : 'Cc:';
+    const lblSubject = isSpanish ? 'Asunto:' : 'Subject:';
+    const greeting = isSpanish ? 'Hola a todos,' : 'Team,';
+    const placeholder = isSpanish ? '&lt;¡su mensaje aquí!&gt;' : '&lt;your message here!&gt;';
 
     let headerBlock = '';
     if (hasRecipients) {
       const toStr = toRecipients.join('; ');
       const ccStr = ccRecipients.join('; ');
       headerBlock = `
-<p class=MsoNormal style='margin-left:120.0pt;text-indent:-120.0pt;tab-stops:120.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span style='font-size:11.0pt;font-family:"Calibri",sans-serif;color:black'>From:<span style='mso-tab-count:1'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></span></b><span style='font-size:11.0pt;font-family:"Calibri",sans-serif;color:black'>${data.senderName}<o:p></o:p></span></p>
+<p class=MsoNormal style='margin-left:120.0pt;text-indent:-120.0pt;tab-stops:120.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span style='font-size:11.0pt;font-family:"Calibri",sans-serif;color:black'>${lblFrom}<span style='mso-tab-count:1'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></span></b><span style='font-size:11.0pt;font-family:"Calibri",sans-serif;color:black'>${data.senderName}<o:p></o:p></span></p>
 
-<p class=MsoNormal style='margin-left:120.0pt;text-indent:-120.0pt;tab-stops:120.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span style='font-size:11.0pt;font-family:"Calibri",sans-serif;color:black'>Sent:<span style='mso-tab-count:1'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></span></b><span style='font-size:11.0pt;font-family:"Calibri",sans-serif;color:black'>${sentDateStr}<o:p></o:p></span></p>
+<p class=MsoNormal style='margin-left:120.0pt;text-indent:-120.0pt;tab-stops:120.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span style='font-size:11.0pt;font-family:"Calibri",sans-serif;color:black'>${lblSent}<span style='mso-tab-count:1'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></span></b><span style='font-size:11.0pt;font-family:"Calibri",sans-serif;color:black'>${sentDateStr}<o:p></o:p></span></p>
 
-${toStr ? `<p class=MsoNormal style='margin-left:120.0pt;text-indent:-120.0pt;tab-stops:120.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span style='font-size:11.0pt;font-family:"Calibri",sans-serif;color:black'>To:<span style='mso-tab-count:1'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></span></b><span style='font-size:11.0pt;font-family:"Calibri",sans-serif;color:black'>${toStr}<o:p></o:p></span></p>` : ''}
+${toStr ? `<p class=MsoNormal style='margin-left:120.0pt;text-indent:-120.0pt;tab-stops:120.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span style='font-size:11.0pt;font-family:"Calibri",sans-serif;color:black'>${lblTo}<span style='mso-tab-count:1'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></span></b><span style='font-size:11.0pt;font-family:"Calibri",sans-serif;color:black'>${toStr}<o:p></o:p></span></p>` : ''}
 
-${ccStr ? `<p class=MsoNormal style='margin-left:120.0pt;text-indent:-120.0pt;tab-stops:120.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span style='font-size:11.0pt;font-family:"Calibri",sans-serif;color:black'>Cc:<span style='mso-tab-count:1'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></span></b><span style='font-size:11.0pt;font-family:"Calibri",sans-serif;color:black'>${ccStr}<o:p></o:p></span></p>` : ''}
+${ccStr ? `<p class=MsoNormal style='margin-left:120.0pt;text-indent:-120.0pt;tab-stops:120.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span style='font-size:11.0pt;font-family:"Calibri",sans-serif;color:black'>${lblCc}<span style='mso-tab-count:1'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></span></b><span style='font-size:11.0pt;font-family:"Calibri",sans-serif;color:black'>${ccStr}<o:p></o:p></span></p>` : ''}
 
-<p class=MsoNormal style='margin-left:120.0pt;text-indent:-120.0pt;tab-stops:120.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span style='font-size:11.0pt;font-family:"Calibri",sans-serif;color:black'>Subject:<span style='mso-tab-count:1'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></span></b><span style='font-size:11.0pt;font-family:"Calibri",sans-serif;color:black'>${subject}<o:p></o:p></span></p>
+<p class=MsoNormal style='margin-left:120.0pt;text-indent:-120.0pt;tab-stops:120.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span style='font-size:11.0pt;font-family:"Calibri",sans-serif;color:black'>${lblSubject}<span style='mso-tab-count:1'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></span></b><span style='font-size:11.0pt;font-family:"Calibri",sans-serif;color:black'>${subject}<o:p></o:p></span></p>
 `;
     }
 
     return `
 ${headerBlock}
 
-<p class=MsoNormal style='font-family:"Aptos",sans-serif;font-size:12.0pt;'>Team,</p>
+<p class=MsoNormal style='font-family:"Aptos",sans-serif;font-size:12.0pt;'>${greeting}</p>
 <p class=MsoNormal style='font-family:"Aptos",sans-serif;font-size:12.0pt;'><o:p>&nbsp;</o:p></p>
-<p class=MsoNormal style='margin-bottom:12.0pt;font-family:"Aptos",sans-serif;font-size:12.0pt;'>&lt;your message here!&gt;</p>
+<p class=MsoNormal style='margin-bottom:12.0pt;font-family:"Aptos",sans-serif;font-size:12.0pt;'>${placeholder}</p>
 `;
   }
 };

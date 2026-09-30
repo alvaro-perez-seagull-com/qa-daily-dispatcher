@@ -1,9 +1,9 @@
-import { SectionIntro } from './section-intro.js?v=35';
-import { SectionSummary } from './section-summary.js?v=35';
-import { SectionScorecard } from './section-scorecard.js?v=35';
-import { SectionBugsChart } from './section-bugs-chart.js?v=39';
-import { SectionBugsList } from './section-bugs-list.js?v=35';
-import { SectionLinks } from './section-links.js?v=35';
+import { SectionIntro } from './section-intro.js?v=44';
+import { SectionSummary } from './section-summary.js?v=44';
+import { SectionScorecard } from './section-scorecard.js?v=44';
+import { SectionBugsChart } from './section-bugs-chart.js?v=44';
+import { SectionBugsList } from './section-bugs-list.js?v=44';
+import { SectionLinks } from './section-links.js?v=44';
 
 /**
  * Master Template Assembler
@@ -13,7 +13,11 @@ export const TemplateMso = {
   /**
    * Assembles the full, rigid MSO HTML email
    */
-  assembleEmailHtml(state) {
+  assembleEmailHtml(state, options = {}) {
+    const emailLocale = options.emailLocale || 'en';
+    const isSpanish = Boolean(options.isSpanish || emailLocale.startsWith('es'));
+    const sectionOptions = { ...options, isSpanish, emailLocale };
+
     // 1. Process Bug Data & Severity Counts with calculated ages
     const severityCounts = SectionBugsList.getSeverityCounts(state.bugs || [], state.referenceDate || new Date());
 
@@ -35,12 +39,12 @@ export const TemplateMso = {
     const scorecardBase64 = SectionScorecard.generateScorecardImage(scoreMetrics);
 
     // 3. Render HTML blocks from each module
-    const introHtml = SectionIntro.renderMsoHtml(state.introData);
-    const summaryHtml = SectionSummary.renderMsoHtml(state.cycles);
-    const scorecardHtml = SectionScorecard.renderMsoHtml(scorecardBase64, scoreMetrics);
-    const chartHtml = SectionBugsChart.renderMsoHtml(chartBase64);
-    const bugsListHtml = SectionBugsList.renderMsoHtml(state.bugs, state.referenceDate || new Date());
-    const linksHtml = SectionLinks.renderMsoHtml(state.links);
+    const introHtml = SectionIntro.renderMsoHtml(state.introData, sectionOptions);
+    const summaryHtml = SectionSummary.renderMsoHtml(state.cycles, sectionOptions);
+    const scorecardHtml = SectionScorecard.renderMsoHtml(scorecardBase64, scoreMetrics, sectionOptions);
+    const chartHtml = SectionBugsChart.renderMsoHtml(chartBase64, sectionOptions);
+    const bugsListHtml = SectionBugsList.renderMsoHtml(state.bugs, state.referenceDate || new Date(), sectionOptions);
+    const linksHtml = SectionLinks.renderMsoHtml(state.links, sectionOptions);
 
     // 4. Wrap with full Word 15 MSO Header & Schema
     return `<html xmlns:v="urn:schemas-microsoft-com:vml"

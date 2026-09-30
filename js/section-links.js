@@ -54,7 +54,8 @@ export const SectionLinks = {
    * Renders the exact Outlook MSO HTML for Links section
    * Dynamically includes IDEA link, Epic link, and List of Bugs based on user input.
    */
-  renderMsoHtml(links = {}) {
+  renderMsoHtml(links = {}, options = {}) {
+    const isSpanish = Boolean(options && (options.isSpanish || options.emailLocale === 'es' || options.emailLocale === 'es-MX'));
     const listItems = [];
 
     // IDEA URL (only if IDEA key provided)
@@ -77,15 +78,17 @@ export const SectionLinks = {
     const filterUrl = (links.filterUrl && links.filterUrl.trim()) ? links.filterUrl.trim() : '';
     if (filterUrl) {
       const displayUrl = this.getShortFilterDisplayUrl(filterUrl);
-      listItems.push(`<li class=MsoListParagraph style='margin-left:0in;mso-list:l0 level1 lfo3'><span style='mso-fareast-font-family:"Times New Roman"'>List of Bugs: <a href="${filterUrl}" target="_blank" rel="noopener noreferrer">${displayUrl}</a><o:p></o:p></span></li>`);
+      const lblBugs = isSpanish ? 'Lista de defectos' : 'List of Bugs';
+      listItems.push(`<li class=MsoListParagraph style='margin-left:0in;mso-list:l0 level1 lfo3'><span style='mso-fareast-font-family:"Times New Roman"'>${lblBugs}: <a href="${filterUrl}" target="_blank" rel="noopener noreferrer">${displayUrl}</a><o:p></o:p></span></li>`);
     }
 
     if (listItems.length === 0) {
       return '';
     }
 
+    const headingText = isSpanish ? 'Enlaces rápidos' : 'Links';
     return `
-<h2 class=MsoHeading2 style='mso-style-name:"Heading 2";mso-outline-level:2;margin-top:12.0pt;margin-right:0in;margin-bottom:6.0pt;margin-left:0in;page-break-after:avoid;font-size:15.0pt;font-family:"Segoe UI",Arial,sans-serif;color:#0F4761;font-weight:bold'><span class=Heading2Char style='mso-style-name:"Heading 2 Char";font-size:15.0pt;font-family:"Segoe UI",Arial,sans-serif;color:#0F4761;font-weight:bold;mso-fareast-font-family:"Times New Roman"'>Links<o:p></o:p></span></h2>
+<h2 class=MsoHeading2 style='mso-style-name:"Heading 2";mso-outline-level:2;margin-top:12.0pt;margin-right:0in;margin-bottom:6.0pt;margin-left:0in;page-break-after:avoid;font-size:15.0pt;font-family:"Segoe UI",Arial,sans-serif;color:#0F4761;font-weight:bold'><span class=Heading2Char style='mso-style-name:"Heading 2 Char";font-size:15.0pt;font-family:"Segoe UI",Arial,sans-serif;color:#0F4761;font-weight:bold;mso-fareast-font-family:"Times New Roman"'>${headingText}<o:p></o:p></span></h2>
 <p class=MsoNormal><o:p>&nbsp;</o:p></p>
 
 <ul style='margin-top:0in' type=disc>

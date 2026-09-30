@@ -1,12 +1,13 @@
-import { SectionIntro } from './section-intro.js?v=35';
-import { SectionSummary } from './section-summary.js?v=35';
-import { SectionScorecard } from './section-scorecard.js?v=35';
-import { SectionBugsChart } from './section-bugs-chart.js?v=39';
-import { SectionBugsList } from './section-bugs-list.js?v=35';
-import { SectionLinks } from './section-links.js?v=35';
-import { TemplateMso } from './template-mso.js?v=35';
-import { ClipboardHelper } from './clipboard.js?v=35';
-import { JiraImporter } from './jira-importer.js?v=35';
+import { SectionIntro } from './section-intro.js?v=44';
+import { SectionSummary } from './section-summary.js?v=44';
+import { SectionScorecard } from './section-scorecard.js?v=44';
+import { SectionBugsChart } from './section-bugs-chart.js?v=44';
+import { SectionBugsList } from './section-bugs-list.js?v=44';
+import { SectionLinks } from './section-links.js?v=44';
+import { TemplateMso } from './template-mso.js?v=44';
+import { ClipboardHelper } from './clipboard.js?v=44';
+import { JiraImporter } from './jira-importer.js?v=44';
+import { I18N } from './i18n.js?v=44';
 
 const STORAGE_KEY = 'seagull_dispatcher_v1';
 
@@ -684,7 +685,7 @@ window.confirmResetForm = function() {
 
 window.copyEmailToClipboard = async function() {
   syncInputsToState();
-  const html = TemplateMso.assembleEmailHtml(state);
+  const html = TemplateMso.assembleEmailHtml(state, { emailLocale: I18N.getEmailLocale() });
   const result = await ClipboardHelper.copyRichHtml(html);
   showToast(result.success ? 'Rich Email copied! Paste directly into Outlook (Cmd+V / Ctrl+V)' : 'Copy failed, please try manual copy.');
 };
@@ -1021,7 +1022,7 @@ function renderCyclesTable() {
 
   if (state.cycles.length === 0) {
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td colspan="10" style="text-align:center;color:var(--text-muted);padding:18px">No test cycles configured. Click <strong>+ Add Test Cycle</strong> below to create your first cycle.</td>`;
+    tr.innerHTML = `<td colspan="10" style="text-align:center;color:var(--text-muted);padding:18px">${I18N.t('cycles.emptyNotice')}</td>`;
     tbody.appendChild(tr);
   } else {
     state.cycles.forEach((c, idx) => {
@@ -1098,7 +1099,7 @@ function renderBugsTable() {
 
   if (state.bugs.length === 0) {
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td colspan="9" style="text-align:center;color:var(--text-muted);padding:18px;line-height:1.6">No defects logged yet; the quality score is 100! If you want to add bugs, either paste from JIRA, or click 'add bug' to add them manually.</td>`;
+    tr.innerHTML = `<td colspan="9" style="text-align:center;color:var(--text-muted);padding:18px;line-height:1.6">${I18N.t('bugs.emptyNotice')}</td>`;
     tbody.appendChild(tr);
   } else {
     state.bugs.forEach((b, idx) => {
@@ -1387,7 +1388,7 @@ function renderPreview() {
     }
   }
 
-  const html = TemplateMso.assembleEmailHtml(state);
+  const html = TemplateMso.assembleEmailHtml(state, { emailLocale: I18N.getEmailLocale() });
   const previewContainer = document.getElementById('email-preview-frame');
   if (previewContainer) {
     previewContainer.srcdoc = html;
@@ -1589,8 +1590,42 @@ function showToast(message, isError = false) {
   }
 }
 
+// Internationalization (i18n) Handlers
+window.switchLanguage = function(locale) {
+  I18N.setLocale(locale);
+  const langSelect = document.getElementById('lang-select');
+  if (langSelect && langSelect.value !== locale) {
+    langSelect.value = locale;
+  }
+};
+
+window.switchEmailLanguage = function(lang) {
+  I18N.setEmailLocale(lang);
+  const btnEn = document.getElementById('btn-email-lang-en');
+  const btnEs = document.getElementById('btn-email-lang-es');
+  if (btnEn && btnEs) {
+    if (lang === 'es') {
+      btnEn.classList.remove('active');
+      btnEs.classList.add('active');
+    } else {
+      btnEs.classList.remove('active');
+      btnEn.classList.add('active');
+    }
+  }
+  renderPreview();
+  showToast(lang === 'es' ? 'Email template set to Spanish' : 'Email template set to English');
+};
+
+window.addEventListener('localeChanged', () => {
+  renderCyclesTable();
+  renderBugsTable();
+  renderLiveStats();
+  validateKeyGate(false);
+});
+
 // Initialization on DOM load
 window.addEventListener('DOMContentLoaded', () => {
+  I18N.init();
   loadSavedState();
   renderSetupForm();
   renderCyclesTable();
