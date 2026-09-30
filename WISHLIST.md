@@ -189,3 +189,21 @@ This document tracks prospective feature requests, UX enhancements, and architec
 ### 18. Day-over-Day Delta & Trend Indicators (Source Scorecard Feature Parity)
 * **Value & Context:** This capability natively exists in Christian Velasco's original scorecard project, tracking day-over-day trajectory and velocity. Incorporating this aligns our email dispatcher directly with the source scoring tool.
 * **Mechanism:** Compare current session with yesterday's imported session JSON or local history snapshot to compute and render historical delta badges (e.g., `Score Delta: 85 ↗ 92 (+7 pts)`, `+3 test cases passed`, `-1 defect resolved`).
+
+---
+
+### 19. Test Cycle Row Drag-and-Drop Reordering (`⋮⋮` Grab Handles) (`💡 Idea / Planned for Tomorrow`)
+* **Problem Statement:** Test cycles added out of chronological or numerical order (e.g. `BPLAT-R925`, `BPLAT-R927`, `BPLAT-R935`, then adding `BPLAT-R926`) currently cannot be reordered without manually retyping row content.
+* **Proposed Scope:**
+  * Add a `⋮⋮` grab handle column on the far left of each row in Tab 2.
+  * Support native HTML5 drag-and-drop row reordering (plus optional `▲` / `▼` nudge buttons for accessibility).
+  * Reorder the underlying `appState.cycles` array dynamically, instantly updating local storage and Tab 4 email preview rendering.
+
+---
+
+### 20. Test Cycle `# ReTest` Average Calculation & Mandatory Validation Gate (`💡 Idea / Planned for Tomorrow`)
+* **Problem Statement:** The `# ReTest` summary column does not currently compute the arithmetic average across cycles, and unpopulated retest fields can distort downstream scorecard calculations.
+* **Proposed Scope:**
+  * **Average Calculation:** Compute the arithmetic average of `# ReTest` values across all configured test cycles in the Total summary row (e.g. `1, 1, 1, 1` = `1`).
+  * **Unpopulated Red Warning:** If any cycle row has a blank `# ReTest` input, render `-` in bold warning red (`#dc2626`) in the Total summary row.
+  * **Mandatory Field Gate:** Enforce `# ReTest` as a mandatory numeric field (`≥ 0`) in the "Continue to Bugs &rarr;" navigation gate, preventing navigation to downstream tabs until all cycles have valid retest counts.
