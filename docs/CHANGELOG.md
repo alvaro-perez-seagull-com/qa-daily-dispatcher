@@ -6,6 +6,26 @@ This document contains the complete historical log of all releases, architectura
 
 ## Release History
 
+### `0.0.11` — Strict JSON Import Validation, Navigation Polish & Defect Chart Subtitle
+- **Strict Session JSON Import Validation & Diagnostics (Wishlist Item 10):**
+  - **OS-Level File Dialog Filter:** Strict `accept=".json,application/json"` attribute on session file input.
+  - **Extension & MIME Guard:** Validates file extension before FileReader execution, rejecting non-JSON documents (`.yaml`, `.csv`, `.txt`) with zero runtime errors.
+  - **Schema Verification Engine (`validateSessionSchema`):** Enforces Dispatcher session structure (`appName === 'Seagull QA Daily Dispatcher'` or `introData`, `cycles`, `bugs`).
+  - **Actionable Diagnostic Messages:** Specifically detects root JSON arrays (e.g. `DS1.json` database/data source tables) and surfaces clear feedback distinguishing tabular record arrays from structured Dispatcher sessions.
+  - **State Protection & Ergonomics:** Leaves active application state 100% untouched upon rejection, surfaces descriptive error alerts and red toast notifications, and resets input value for immediate re-selection without page reload.
+- **Defect Distribution Chart Subtitle Correction (Wishlist Item 12):**
+  - Updated canvas subtitle rendering in `SectionBugsChart` from `"Total Active Defects: ${totalBugs}"` to `"Total Defects: ${totalBugs}"` to accurately reflect total logged defects (active, resolved, or closed).
+- **Tab 4 Live Email Preview Navigation & Action Button Labels (Wishlist Item 9):**
+  - Added standard **"← Back to Bugs"** button on the bottom-left of Tab 4's action toolbar (`onclick="switchTab('bugs')"`).
+  - Cleaned up export action button label to simply **"Export Session"**.
+  - Organized bottom actions into a clear left group (`[ ← Back to Bugs ]`, `[ Export Session ]`) and right group (`[ Copy Formatted Email ]`).
+- **Header Score Gauge Optimization:**
+  - Expanded circular container diameter from 46px to 52px and refined label typography (7.5px bold) so 100 / "Excellent" status renders cleanly without intersecting the circular boundary ring.
+- **Generic Brand Subtitle Harmonization:**
+  - Generalized brand sub-header to `"Automated Outlook Daily Status Generator"` across `index.html` and `README.md`, removing product-specific references to neutrally accommodate BarTender Track & Trace (BTT) teams alongside BTC and BTO initiatives.
+- **Documentation Restructuring:**
+  - Archived complete release history in `docs/CHANGELOG.md` and maintained rolling 5-release window in `README.md`.
+
 ### `0.0.10` — Stale Date Warning UI, Test Cycle READY State & Setup Action Button Harmonization
 - **Stale Session Date Warning Banner & 1-Click Refresh:**
   - Auto-detects outdated session dates on session import (`importedDate !== today`).
