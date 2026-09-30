@@ -13,7 +13,7 @@ export const I18N = {
   translations: {
     'en': {
       'brand.title': 'Seagull QA Daily Dispatcher',
-      'brand.subtitle': 'Automated Outlook Daily Status Generator for BarTender Cloud & OnPrem',
+      'brand.subtitle': 'Automated Outlook Daily Status Generator',
       'tabs.setup': '1. Project Setup & Links',
       'tabs.summary': '2. Test Cycles Summary',
       'tabs.bugs': '3. List of Bugs (Jira)',
@@ -128,7 +128,7 @@ export const I18N = {
 
     'es-MX': {
       'brand.title': 'Seagull QA Daily Dispatcher',
-      'brand.subtitle': 'Generador automatizado de estado diario de Outlook para BarTender Cloud y OnPrem',
+      'brand.subtitle': 'Generador automatizado de estado diario de Outlook',
       'tabs.setup': '1. Configuración del proyecto y enlaces',
       'tabs.summary': '2. Resumen de ciclos de prueba',
       'tabs.bugs': '3. Lista de defectos (Jira)',
@@ -243,7 +243,7 @@ export const I18N = {
 
     'es-BO': {
       'brand.title': 'Seagull QA Daily Dispatcher',
-      'brand.subtitle': 'Generador automatizado de reporte diario de Outlook para BarTender Cloud y OnPrem',
+      'brand.subtitle': 'Generador automatizado de reporte diario de Outlook',
       'tabs.setup': '1. Configuración del proyecto y enlaces',
       'tabs.summary': '2. Resumen de ciclos de prueba',
       'tabs.bugs': '3. Lista de defectos (Jira)',
